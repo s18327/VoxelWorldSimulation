@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /* It's a class that enables or disables trees on a terrain */
-public class TreeEnableDisable : MonoBehaviour
+public class TreeSwitch : MonoBehaviour
 {
     public GameObject treeSetParameter;
     public NoiseSettings treeEnable;
@@ -57,14 +57,14 @@ public class TreeEnableDisable : MonoBehaviour
 /// This function is called when the user clicks the "Enable Trees" button.
 /// </summary>
     public void TreeEnable()
-{
+    {
     foreach (var biome in biomeGenerators)
     {
         biome.GetComponent<TreeGenerator>().treeNoiseSettings = treeEnable;
     }
 
     SetClicked();
-}
+    }
 
 /// <summary>
 /// It loops through all the biome generators and sets their tree noise settings to the treeDisable

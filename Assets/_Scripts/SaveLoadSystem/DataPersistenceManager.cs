@@ -3,36 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
 /* It's a class that saves and loads data from a file */
 public class DataPersistenceManager : MonoBehaviour
 {
     [Header("File Storage Config")]
     [SerializeField] private string fileNamePlayerData;
-    [SerializeField] private string fileNameWorldData;
-    [SerializeField] private string fileNameGameData;
+    [SerializeField] private string fileNameTerrainParameters;
+    [SerializeField] private string fileNameTerrainData;
     [SerializeField] private bool useEncryption;
 
     public PlayerData playerData;
-    public WorldData worldData;
-    public GameData gameData;
+    public TerrainParameters terrainParameters;
+    public TerrainData terrainData;
 
-    public Dictionary<Vector3Int, ChunkData> loadedChunkDataDictionary = new Dictionary<Vector3Int, ChunkData>();
+    public Dictionary<Vector3Int, Chunk> loadedChunkDataDictionary = new ();
     private List<IDataPersistence> dataPersistenceObjects;
     private FileDataHandler dataHandler;
 
-    public static DataPersistenceManager instance { get; private set; }
+    private static DataPersistenceManager Instance { get; set; }
 
 /// <summary>
 /// If there is more than one Data Persistence Manager in the scene, throw an error
 /// </summary>
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Debug.LogError("Found more than one Data Persistence Manager in the scene.");
         }
-        instance = this;
+        Instance = this;
     }
 
 /// <summary>
@@ -40,111 +41,105 @@ public class DataPersistenceManager : MonoBehaviour
 /// </summary>
     private void Start()
     {
-        this.dataHandler = new FileDataHandler(Application.persistentDataPath, fileNamePlayerData, fileNameWorldData, fileNameGameData, useEncryption);
-        this.dataPersistenceObjects = FindAllDataPersistenceObjects();
+        dataHandler = new FileDataHandler(Application.persistentDataPath, fileNamePlayerData, fileNameTerrainParameters, fileNameTerrainData, useEncryption);
+        dataPersistenceObjects = FindAllDataPersistenceObjects();
     }
 
 
     public void NewGame()
     {
         print("new game");
-        PlayerData player = new PlayerData();
-        WorldData block = new WorldData();
-        GameData game = new GameData();
 
-
-        this.playerData = new PlayerData();
-        this.worldData = new WorldData();
-        this.gameData = new GameData();
+        playerData = new PlayerData();
+        terrainParameters = new TerrainParameters();
+        terrainData = new TerrainData();
     }
 
 /// <summary>
-/// It loads the game data from a JSON file, and then uses that data to generate the world
+/// It loads the game data from a JSON file, and then uses that data to generate the terrain
 /// </summary>
     public void LoadGame()
     {
         print("load game");
-        this.playerData = dataHandler.LoadPlayerData();
-        this.worldData = dataHandler.LoadWorldData();
-        this.gameData = dataHandler.LoadGameData();
+        playerData = dataHandler.LoadPlayerData();
+        terrainParameters = dataHandler.LoadTerrainParameters();
+        terrainData = dataHandler.LoadTerrainData();
 
         /* It's checking if the data is null, if it is, it creates new data. */
-        if (this.playerData == null || this.worldData == null || this.gameData == null)
+        if (playerData == null || terrainParameters == null || terrainData == null)
         {
             Debug.Log("No data was found. Initializing data to defaults.");
             NewGame();
         }
 
-        /* Calling the LoadPlayerData, LoadWorldData, and LoadGameData methods from the IDataPersistence
+        /* Calling the LoadPlayerData, LoadTerrainParameters, and LoadTerrainData methods from the IDataPersistence
             interface. */
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.LoadPlayerData(playerData);
-            dataPersistenceObj.LoadWorldData(worldData);
-            dataPersistenceObj.LoadGameData(gameData);
+            dataPersistenceObj.LoadTerrainParameters(terrainParameters);
+            dataPersistenceObj.LoadTerrainData(terrainData);
         }
-        //TODO: Debug This
-        Dictionary<string, ChunkData> newLoadedChunkDataDictionary = JsonConvert.DeserializeObject<Dictionary<string, ChunkData>>(this.gameData.jsonChunkDataDictionary);
+        Dictionary<string, Chunk> newLoadedChunkDataDictionary = JsonConvert.DeserializeObject<Dictionary<string, Chunk>>(terrainData.jsonChunkDataDictionary);
         string[] stringKeys = newLoadedChunkDataDictionary.Keys.ToArray();
         Vector3Int[] keys = new Vector3Int[stringKeys.Length];
-        ChunkData[] values = newLoadedChunkDataDictionary.Values.ToArray();
+        Chunk[] values = newLoadedChunkDataDictionary.Values.ToArray();
 
         for (int i = 0; i < stringKeys.Length; i++)
         {
             keys[i] = StringToVector3(stringKeys[i]);
             loadedChunkDataDictionary.Add(keys[i], values[i]);
-            loadedChunkDataDictionary[keys[i]].worldReference = GameObject.Find("World").GetComponent<World>();
+            loadedChunkDataDictionary[keys[i]].terrainReference = GameObject.Find("Terrain").GetComponent<Terrain>();
         }
 
 
-        GameObject.Find("World").GetComponent<World>().GenerateWorld();
+        GameObject.Find("Terrain").GetComponent<Terrain>().GenerateTerrain();
     }
 
 /// <summary>
 /// It saves the game data to a file.
 /// 
 /// The function is called when the player presses the exit button.
-/// The function first gets the world object and then gets the game data from it.
+/// The function first gets the terrain object and then gets the game data from it.
 /// 
 /// The game data is a class that contains all the data that needs to be saved.
 /// The game data contains a dictionary that contains all the chunk data.
 /// 
 /// The chunk data is a class that contains all the data that needs to be saved for each chunk.
-/// The chunk data contains a dictionary that contains all the block data.
+/// The chunk data contains a dictionary that contains all the voxel data.
 /// 
-/// The block data is a class that contains all the data that needs to be saved for each block.
+/// The voxel data is a class that contains all the data that needs to be saved for each voxel.
 /// </summary>
     public void SaveGame()
     {
-        World world = GameObject.Find("World").GetComponent<World>();
-        this.gameData = world.gameData;
-        this.gameData.jsonChunkDataDictionary = JsonConvert.SerializeObject(gameData.chunkDataDictionary, Formatting.None);
+        Terrain terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
+        terrainData = terrain.terrainData;
+        terrainData.jsonChunkDataDictionary = JsonConvert.SerializeObject(terrainData.chunkDataDictionary, Formatting.None);
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         Vector3 playerPos = player.transform.position;
         Quaternion playerRot = player.transform.rotation;
-        this.playerData.spawnPos = GameObject.Find("GameManager").GetComponent<GameManager>().spawnPos;
-        this.playerData.playerPosition = playerPos;
-        this.playerData.playerRotation = playerRot;
+        playerData.spawnPos = GameObject.Find("Game Manager").GetComponent<GameManager>().spawnPos;
+        playerData.playerPosition = playerPos;
+        playerData.playerRotation = playerRot;
 
-        this.worldData.mapSizeInChunk = world.mapSizeInChunks;
-        this.worldData.chunkSize = world.chunkSize;
-        this.worldData.chunkHeight = world.chunkHeight;
-        this.worldData.chunkDrawRange = world.chunkDrawingRange;
-        this.worldData.mapSeedOffset =  world.mapSeedOffset;
+        
+        terrainParameters.chunkSize = terrain.chunkSize;
+        terrainParameters.chunkHeight = terrain.chunkHeight;
+        terrainParameters.chunkDrawRange = terrain.chunkDrawingRange;
+        terrainParameters.mapSeedOffset =  terrain.mapSeedOffset;
 
 
         foreach (var dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.SavePlayerData(playerData);
-            dataPersistenceObj.SaveWorldData(worldData);
-            dataPersistenceObj.SaveGameData(gameData);
+            dataPersistenceObj.SaveTerrainParameters(terrainParameters);
+            dataPersistenceObj.SaveTerrainData(terrainData);
         }
-
-
+        
         dataHandler.SavePlayerData(playerData);
-        dataHandler.SaveWorldData(worldData);
-        dataHandler.SaveGameData(gameData);
+        dataHandler.SaveTerrainParameters(terrainParameters);
+        dataHandler.SaveTerrainData(terrainData);
     }
 
 /// <summary>

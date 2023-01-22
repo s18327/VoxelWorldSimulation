@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Serialization;
 
-/* It's a class that handles the player's movement and interaction with the world. */
+/* It's a class that handles the player's movement and interaction with the terrain. */
 public class Character : MonoBehaviour
 {
     [SerializeField]
@@ -19,15 +20,15 @@ public class Character : MonoBehaviour
 
     public bool fly;
 
-    bool isWaiting;
+    private bool isWaiting;
 
-    public World world;
-    public string currentBlock;
+    public Terrain terrain;
+    public string currentVoxel;
 
 
 /// <summary>
 /// If the main camera is null, set it to the main camera. Then, get the player input and player
-/// movement components, and find the world object
+/// movement components, and find the terrain object
 /// </summary>
     private void Awake()
     {
@@ -35,7 +36,7 @@ public class Character : MonoBehaviour
             mainCamera = Camera.main;
         playerInput = GetComponent<PlayerInput>();
         playerMovement = GetComponent<PlayerMovement>();
-        world = FindObjectOfType<World>();
+        terrain = FindObjectOfType<Terrain>();
     }
 /// <summary>
 /// "When the player clicks the left mouse button, call the HandleLeftMouseClick function."
@@ -59,8 +60,8 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-       /* It's getting the current block that the player has selected. */
-        currentBlock = VoxelDataManager.selectablevoxelList.ElementAt(playerInput.BlockTypeNumberSelected).Key.ToString();
+       /* It's getting the current voxel that the player has selected. */
+        currentVoxel = VoxelDataManager.selectableVoxelList.ElementAt(playerInput.VoxelTypeNumberSelected).Key.ToString();
         if (fly)
         {
             playerMovement.Fly(playerInput.MovementInput, playerInput.IsJumping, playerInput.RunningPressed);
@@ -103,27 +104,27 @@ public class Character : MonoBehaviour
         }
     }
 /// <summary>
-/// If the player right clicks, and the raycast hits the ground, place a block
+/// If the player right clicks, and the raycast hits the ground, place a voxel
 /// </summary>
     private void HandleRightMouseClick()
     {
         Ray playerRay = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         if (!Physics.Raycast(playerRay, out var hit, interactionRayLength, groundMask)) return;
-        PlaceBlock(hit);
+        PlaceVoxel(hit);
     }
 
     private void ModifyTerrain(RaycastHit hit)
     {
-        world.SetBlock(hit, VoxelType.Air);
+        terrain.SetVoxel(hit, VoxelType.Air);
     }
 
 /// <summary>
-/// > This function takes the block type number selected by the player and uses it to place a block of
+/// > This function takes the voxel type number selected by the player and uses it to place a voxel of
 /// the corresponding type at the location of the raycast hit
 /// </summary>
 /// <param name="hit">The raycast hit that was returned from the raycast.</param>
-    private void PlaceBlock(RaycastHit hit)
+    private void PlaceVoxel(RaycastHit hit)
     {
-        world.PlaceBlock(hit, VoxelDataManager.selectablevoxelList.ElementAt(playerInput.BlockTypeNumberSelected).Key);
+        terrain.PlaceVoxel(hit, VoxelDataManager.selectableVoxelList.ElementAt(playerInput.VoxelTypeNumberSelected).Key);
     }
 }

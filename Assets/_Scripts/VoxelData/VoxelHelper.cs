@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class VoxelHelper
@@ -20,28 +21,28 @@ public static class VoxelHelper
     }
 
     /// <summary>
-    /// If the block is not air or nothing, then for each direction, if the block in that direction is not
+    /// If the voxel is not air or nothing, then for each direction, if the voxel in that direction is not
     /// solid, then add the face data for that direction to the mesh data
     /// </summary>
-    /// <param name="chunk">The chunk that the block is in</param>
-    /// <param name="x">The x coordinate of the block in the chunk</param>
-    /// <param name="y">The y coordinate of the block</param>
-    /// <param name="z">The z coordinate of the block</param>
-    /// <param name="meshData">The mesh data that will be returned.</param>
-    /// <param name="voxelType">The type of block that is being checked.</param>
+    /// <param name="chunk">The chunk that the voxel is in</param>
+    /// <param name="x">The x coordinate of the voxel in the chunk</param>
+    /// <param name="y">The y coordinate of the voxel</param>
+    /// <param name="z">The z coordinate of the voxel</param>
+    /// <param name="mesh">The mesh data that will be returned.</param>
+    /// <param name="voxelType">The type of voxel that is being checked.</param>
     /// <returns>
-    /// The mesh data of the block.
+    /// The mesh data of the voxel.
     /// </returns>
-    public static MeshData GetMeshData
-        (ChunkData chunk, int x, int y, int z, MeshData meshData, VoxelType voxelType)
+    public static Mesh GetMeshData
+        (Chunk chunk, int x, int y, int z, Mesh mesh, VoxelType voxelType)
     {
         if (voxelType is VoxelType.Air or VoxelType.Nothing)
-            return meshData;
+            return mesh;
 
         foreach (Direction direction in Directions)
         {
             var adjacentVoxelLocation = new Vector3Int(x, y, z) + direction.GetVector();
-            var adjacentVoxelType = Chunk.GetBlockFromChunkCoordinates(chunk, adjacentVoxelLocation);
+            var adjacentVoxelType = ChunkHelper.GetVoxelFromChunkCoordinates(chunk, adjacentVoxelLocation);
 
             if (adjacentVoxelType is VoxelType.Nothing ||
                 VoxelDataManager.voxelDataDictionary[adjacentVoxelType].isSolid)
@@ -49,90 +50,90 @@ public static class VoxelHelper
             if (voxelType is VoxelType.Water)
             {
                 if (adjacentVoxelType is VoxelType.Air)
-                    meshData.waterSubMeshData = GetFaceDataIn(direction, x, y, z, meshData.waterSubMeshData, voxelType);
+                    mesh.waterSubMesh = GetFaceDataIn(direction, x, y, z, mesh.waterSubMesh, voxelType);
             }
             else
             {
-                meshData = GetFaceDataIn(direction, x, y, z, meshData, voxelType);
+                mesh = GetFaceDataIn(direction, x, y, z, mesh, voxelType);
             }
         }
 
-        return meshData;
+        return mesh;
     }
 
     /// <summary>
     /// It adds the vertices, triangles, and UVs of a face to the mesh data
     /// </summary>
     /// <param name="direction">The direction of the face.</param>
-    /// <param name="x">The x position of the block in the chunk</param>
-    /// <param name="y">the y position of the block</param>
-    /// <param name="z">The z position of the block in the chunk</param>
-    /// <param name="meshData">The mesh data that will be returned.</param>
-    /// <param name="voxelType">The type of block that is being generated.</param>
+    /// <param name="x">The x position of the voxel in the chunk</param>
+    /// <param name="y">the y position of the voxel</param>
+    /// <param name="z">The z position of the voxel in the chunk</param>
+    /// <param name="mesh">The mesh data that will be returned.</param>
+    /// <param name="voxelType">The type of voxel that is being generated.</param>
     /// <returns>
-    /// The meshData is being returned.
+    /// The mesh is being returned.
     /// </returns>
-    private static MeshData GetFaceDataIn(Direction direction, int x, int y, int z, MeshData meshData,
+    private static Mesh GetFaceDataIn(Direction direction, int x, int y, int z, Mesh mesh,
         VoxelType voxelType)
     {
-        GetFaceVertices(direction, x, y, z, meshData, voxelType);
-        meshData.AddTriangles(VoxelDataManager.voxelDataDictionary[voxelType].generatesCollider);
-        meshData.uvList.AddRange(FaceUVs(direction, voxelType));
+        AddFaceVerticesToMesh(direction, x, y, z, mesh, voxelType);
+        mesh.AddTriangles(VoxelDataManager.voxelDataDictionary[voxelType].isGeneratingCollider);
+        mesh.uvList.AddRange(GetFaceUvVectors(direction, voxelType));
 
-        return meshData;
+        return mesh;
     }
 
     /// <summary>
     /// It adds the vertices of a face to the mesh data
     /// </summary>
     /// <param name="direction">The direction of the face.</param>
-    /// <param name="x">The x position of the block</param>
-    /// <param name="y">the y position of the block</param>
-    /// <param name="z">The z position of the block</param>
-    /// <param name="meshData">The mesh data that will be used to create the mesh.</param>
-    /// <param name="voxelType">The type of block that is being generated.</param>
-    private static void GetFaceVertices(Direction direction, int x, int y, int z, MeshData meshData,
+    /// <param name="x">The x position of the voxel</param>
+    /// <param name="y">the y position of the voxel</param>
+    /// <param name="z">The z position of the voxel</param>
+    /// <param name="mesh">The mesh data that will be used to create the mesh.</param>
+    /// <param name="voxelType">The type of voxel that is being generated.</param>
+    private static void AddFaceVerticesToMesh(Direction direction, int x, int y, int z, Mesh mesh,
         VoxelType voxelType)
     {
-        var generatingCollider = VoxelDataManager.voxelDataDictionary[voxelType].generatesCollider;
+        var generatingCollider = VoxelDataManager.voxelDataDictionary[voxelType].isGeneratingCollider;
         switch (direction)
         {
             case Direction.Backwards:
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
                 break;
             case Direction.Forward:
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
                 break;
             case Direction.Left:
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
                 break;
 
             case Direction.Right:
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
                 break;
             case Direction.Down:
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f), generatingCollider);
                 break;
             case Direction.Up:
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
-                meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
+                mesh.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f), generatingCollider);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
@@ -140,15 +141,15 @@ public static class VoxelHelper
     }
 
     /// <summary>
-    /// It takes a direction and a block type, and returns a Vector2 array of UV coordinates for the face of
-    /// the block in that direction
+    /// It takes a direction and a voxel type, and returns a Vector2 array of UV coordinates for the face of
+    /// the voxel in that direction
     /// </summary>
     /// <param name="direction">The direction of the face.</param>
-    /// <param name="voxelType">The type of block you want to get the UVs for.</param>
+    /// <param name="voxelType">The type of voxel you want to get the UVs for.</param>
     /// <returns>
-    /// The UVs of the block.
+    /// The UVs of the voxel.
     /// </returns>
-    private static Vector2[] FaceUVs(Direction direction, VoxelType voxelType)
+    private static IEnumerable<Vector2> GetFaceUvVectors(Direction direction, VoxelType voxelType)
     {
         var faceUVs = new Vector2[4];
         var texturePosition = TexturePosition(direction, voxelType);
@@ -174,8 +175,8 @@ public static class VoxelHelper
     /// If the direction is up, return the up texture position, if the direction is down, return the down
     /// texture position, otherwise return the side texture position
     /// </summary>
-    /// <param name="direction">The direction of the block.</param>
-    /// <param name="voxelType">The type of block you want to get the texture position of.</param>
+    /// <param name="direction">The direction of the voxel.</param>
+    /// <param name="voxelType">The type of voxel you want to get the texture position of.</param>
     /// <returns>
     /// A Vector2Int
     /// </returns>

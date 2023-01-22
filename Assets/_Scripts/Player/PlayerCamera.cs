@@ -41,7 +41,7 @@ public class PlayerCamera : MonoBehaviour
 /// </summary>
     void Update()
 {
-    if (GameObject.Find("GameManager").GetComponent<GameManager>().keyClicked) return;
+    if (GameObject.Find("Game Manager").GetComponent<GameManager>().keyClicked) return;
     
     float mouseX = playerInput.MousePosition.x * sensitivity * Time.deltaTime;
     float mouseY = playerInput.MousePosition.y * sensitivity * Time.deltaTime;

@@ -4,8 +4,9 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
-/* It's a class that renders a chunk of the world */
+/* It's a class that renders a chunk of the Terrain */
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
@@ -14,15 +15,14 @@ public class ChunkRenderer : MonoBehaviour
     
     MeshFilter meshFilter;
     MeshCollider meshCollider;
-    Mesh mesh;
-    public bool showGizmo = false;
+    UnityEngine.Mesh mesh;
+    
 
-    public ChunkData ChunkData;
-
-    public bool ModifiedByThePlayer
+    public Chunk chunk;
+    public bool showGizmo;
+    public bool IsPlayerModified
     {
-        get => ChunkData.modifiedByThePlayer;
-        set => ChunkData.modifiedByThePlayer = value;
+        set => chunk.isPlayerModified = value;
     }
 
 /// <summary>
@@ -42,13 +42,13 @@ public class ChunkRenderer : MonoBehaviour
 /// the chunk, which the chunk then uses to create the chunk
 /// </summary>
 /// <param name="data">This is the data that will be used to generate the chunk.</param>
-    public void InitializeChunk(ChunkData data)
+    public void InitializeChunk(Chunk data)
     {
-        ChunkData = data;
+        chunk = data;
     }
 
 /// <summary>
-/// Mesh.vertices = meshData.vertices.Concat(meshData.waterMesh.vertices).ToArray();
+/// Mesh.vertices = mesh.vertices.Concat(mesh.waterMesh.vertices).ToArray();
 /// 
 /// The above line of code is the only line that needs to be changed to make the water mesh render.
 /// 
@@ -57,24 +57,24 @@ public class ChunkRenderer : MonoBehaviour
 /// The water mesh is rendered as a second sub mesh because the water mesh is rendered with a different
 /// shader than the terrain mesh.
 /// </summary>
-/// <param name="meshData">This is the class that contains all the data for the mesh.</param>
-    private void RenderMesh(MeshData meshData)
+/// <param name="mesh">This is the class that contains all the data for the mesh.</param>
+    private void RenderMesh(Mesh mesh)
     {
-        mesh.Clear();
+        this.mesh.Clear();
 
-        mesh.subMeshCount = 2;
-        mesh.vertices = meshData.vertexList.Concat(meshData.waterSubMeshData.vertexList).ToArray();
+        this.mesh.subMeshCount = 2;
+        this.mesh.vertices = mesh.vertexList.Concat(mesh.waterSubMesh.vertexList).ToArray();
 
-        mesh.SetTriangles(meshData.triangleList.ToArray(), 0);
-        mesh.SetTriangles(meshData.waterSubMeshData.triangleList.Select(val => val + meshData.vertexList.Count).ToArray(), 1);
+        this.mesh.SetTriangles(mesh.triangleList.ToArray(), 0);
+        this.mesh.SetTriangles(mesh.waterSubMesh.triangleList.Select(val => val + mesh.vertexList.Count).ToArray(), 1);
 
-        mesh.uv = meshData.uvList.Concat(meshData.waterSubMeshData.uvList).ToArray();
-        mesh.RecalculateNormals();
+        this.mesh.uv = mesh.uvList.Concat(mesh.waterSubMesh.uvList).ToArray();
+        this.mesh.RecalculateNormals();
 
         meshCollider.sharedMesh = null;
-        Mesh collisionMesh = new Mesh();
-        collisionMesh.vertices = meshData.colliderVertexList.ToArray();
-        collisionMesh.triangles = meshData.colliderTriangleList.ToArray();
+        UnityEngine.Mesh collisionMesh = new UnityEngine.Mesh();
+        collisionMesh.vertices = mesh.colliderVertexList.ToArray();
+        collisionMesh.triangles = mesh.colliderTriangleList.ToArray();
         collisionMesh.RecalculateNormals();
 
         meshCollider.sharedMesh = collisionMesh;
@@ -85,14 +85,14 @@ public class ChunkRenderer : MonoBehaviour
 /// </summary>
     public void UpdateChunk()
     {
-        RenderMesh(Chunk.GetChunkMeshData(ChunkData));
+        RenderMesh(ChunkHelper.GetChunkMeshData(chunk));
     }
 
 /// <summary>
 /// "This function updates the mesh of the chunk with the data provided."
 /// </summary>
 /// <param name="data">The mesh data that will be used to update the mesh.</param>
-    public void UpdateChunk(MeshData data)
+    public void UpdateChunk(Mesh data)
     {
         RenderMesh(data);
     }
@@ -105,11 +105,11 @@ public class ChunkRenderer : MonoBehaviour
 {
     if (!showGizmo) return;
     
-    if (!Application.isPlaying || ChunkData == null) return;
+    if (!Application.isPlaying || chunk == null) return;
     
     Gizmos.color = Selection.activeObject == gameObject ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 1, 0.4f);
 
-    Gizmos.DrawCube(transform.position + new Vector3(ChunkData.chunkSize / 2f, ChunkData.chunkHeight / 2f, ChunkData.chunkSize / 2f), new Vector3(ChunkData.chunkSize, ChunkData.chunkHeight, ChunkData.chunkSize));
+    Gizmos.DrawCube(transform.position + new Vector3(chunk.chunkSize / 2f, chunk.chunkHeight / 2f, chunk.chunkSize / 2f), new Vector3(chunk.chunkSize, chunk.chunkHeight, chunk.chunkSize));
 }
 #endif
 }

@@ -12,7 +12,7 @@ public class PlayerInput : MonoBehaviour
     public Vector2 MousePosition { get; private set; }
     public bool IsJumping { get; private set; }
 
-    public int BlockTypeNumberSelected { get; set; }
+    public int VoxelTypeNumberSelected { get; set; }
 
 /// <summary>
 /// This function is called every frame and updates the values of the input variables

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /* It's a class that holds a list of vertices, triangles, and uv coordinates. It also has a list of
-vertices and triangles for the collider mesh. It also has a reference to another MeshData object
+vertices and triangles for the collider mesh. It also has a reference to another Mesh object
 that will be used for the water mesh */
-public class MeshData
+public class Mesh
 {
     public List<Vector3> vertexList = new();
     public List<int> triangleList = new();
@@ -13,14 +13,14 @@ public class MeshData
     public List<Vector3> colliderVertexList = new();
     public List<int> colliderTriangleList = new();
 
-    public MeshData waterSubMeshData;
+    public Mesh waterSubMesh;
 
 /* It's a constructor that takes a boolean as a parameter. If the boolean is true, it creates a new
-MeshData object and assigns it to the waterMesh variable. */
-    public MeshData(bool isMainMesh)
+Mesh object and assigns it to the waterMesh variable. */
+    public Mesh(bool isMainMesh)
     {
         if (!isMainMesh) return;
-        waterSubMeshData = new MeshData(false);
+        waterSubMesh = new Mesh(false);
     }
 
     /// <summary>

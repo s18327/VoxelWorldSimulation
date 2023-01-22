@@ -54,8 +54,8 @@ public static class MyOctavePerlin
         float amplitudeSum = 0;
         for (var i = 0; i < settings.octaves; i++)
         {
-            noise += Mathf.PerlinNoise((settings.offset.x + settings.worldOffset.x + x) * frequency, 
-                                        (settings.offset.y + settings.worldOffset.y + z) * frequency) * amplitude;
+            noise += Mathf.PerlinNoise((settings.offset.x + settings.terrainOffset.x + x) * frequency, 
+                                        (settings.offset.y + settings.terrainOffset.y + z) * frequency) * amplitude;
 
             amplitudeSum += amplitude;
 

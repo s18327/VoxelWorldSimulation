@@ -13,7 +13,7 @@ public class BiomeGenerator : MonoBehaviour
 
     public bool domainWarpingEnabled = true;
 
-    /* It's a reference to a class that handles the first layer of blocks. */
+    /* It's a reference to a class that handles the first layer of voxels. */
     public LayerHandler startLayerHandler;
 
     public TreeGenerator treeGenerator;
@@ -22,48 +22,48 @@ public class BiomeGenerator : MonoBehaviour
 
     /// <summary>
     /// If the treeGenerator is null, return an empty TreeData, otherwise return the treeGenerator's
-    /// GenerateTreeData function.
+    /// CreateTreeData function.
     /// </summary>
     /// <param name="data">This is the data that the chunk is using to generate itself.</param>
-    /// <param name="mapSeedOffset">The position of the chunk in the world.</param>
+    /// <param name="mapSeedOffset">The position of the chunk in the terrain.</param>
     /// <returns>
     /// A TreeData object.
     /// </returns>
-    internal TreeData GetTreeData(ChunkData data, Vector2Int mapSeedOffset)
+    internal TreeData GetTreeData(Chunk data, Vector2Int mapSeedOffset)
     {
-        return treeGenerator is null ? new TreeData() : treeGenerator.GenerateTreeData(data, mapSeedOffset);
+        return treeGenerator is null ? new TreeData() : treeGenerator.CreateTreeData(data, mapSeedOffset);
     }
 
 
     /// <summary>
-    /// It takes a chunk of data, and adds blocks to it
+    /// It takes a chunk of data, and adds voxels to it
     /// </summary>
     /// <param name="data">This is the data that will be returned. It contains the chunk's position,
-    /// the chunk's height, and the chunk's blocks.</param>
+    /// the chunk's height, and the chunk's voxels.</param>
     /// <param name="x">The x position of the chunk column</param>
     /// <param name="z">The z position of the chunk column</param>
-    /// <param name="seedOffset">The position of the chunk in the world.</param>
+    /// <param name="seedOffset">The position of the chunk in the terrain.</param>
     /// <param name="noiseHeight">This is the height of the terrain at the given x,z position. If you
-    /// don't have this, you can use the GetSurfaceHeightNoise function to get it.</param>
+    /// don't have this, you can use the GetSurfaceHeight function to get it.</param>
     /// <returns>
-    /// The ChunkData object is being returned.
+    /// The Chunk object is being returned.
     /// </returns>
-    public ChunkData ProcessChunkColumn(ChunkData data, int x, int z, Vector2Int seedOffset, int? noiseHeight)
+    public Chunk ProcessChunkColumn(Chunk data, int x, int z, Vector2Int seedOffset, int? noiseHeight)
     {
-        biomeNoiseSettings.worldOffset = seedOffset;
+        biomeNoiseSettings.terrainOffset = seedOffset;
 
         var groundPosition = noiseHeight.HasValue == false
-            ? GetSurfaceHeightNoise(data.worldPosition.x + x, data.worldPosition.z + z, data.chunkHeight)
+            ? GetSurfaceHeight(data.terrainPosition.x + x, data.terrainPosition.z + z, data.chunkHeight)
             : noiseHeight.Value;
 
-        for (var y = data.worldPosition.y; y < data.worldPosition.y + data.chunkHeight; y++)
+        for (var y = data.terrainPosition.y; y < data.terrainPosition.y + data.chunkHeight; y++)
         {
             startLayerHandler.Handle(data, x, y, z, groundPosition, seedOffset);
         }
 
         foreach (var layer in additionalLayerHandlers)
         {
-            layer.Handle(data, x, data.worldPosition.y, z, groundPosition, seedOffset);
+            layer.Handle(data, x, data.terrainPosition.y, z, groundPosition, seedOffset);
         }
 
         return data;
@@ -79,7 +79,7 @@ public class BiomeGenerator : MonoBehaviour
     /// <returns>
     /// The surface height of the terrain.
     /// </returns>
-    public int GetSurfaceHeightNoise(int x, int z, int chunkHeight)
+    public int GetSurfaceHeight(int x, int z, int chunkHeight)
     {
         var terrainHeight = domainWarpingEnabled == false
             ? MyOctavePerlin.OctavePerlin(x, z, biomeNoiseSettings)
@@ -87,5 +87,45 @@ public class BiomeGenerator : MonoBehaviour
 
         terrainHeight = MyOctavePerlin.Redistribution(terrainHeight, biomeNoiseSettings);
         return MyOctavePerlin.RemapValueToInt(terrainHeight, 0, chunkHeight);
+    }
+    
+    /// <summary>
+    /// It takes the player's position, the draw range, and the map size, and returns a list of biome
+    /// centers
+    /// </summary>
+    /// <param name="playerPosition">playerPosition</param>
+    /// <param name="drawRange">The number of biomes to draw in each direction.</param>
+    /// <param name="mapSize">The size of the map in chunks.</param>
+    /// <returns>
+    /// A list of Vector3Ints
+    /// </returns>
+    public static List<Vector3Int> CalculateBiomeCenters(Vector3 playerPosition, int drawRange, int mapSize)
+    {
+        int biomeLength = drawRange * mapSize;
+
+        Vector3Int originPoint = new Vector3Int(
+            Mathf.RoundToInt(playerPosition.x / biomeLength) * biomeLength,
+            0,
+            Mathf.RoundToInt(playerPosition.z / biomeLength) * biomeLength);
+
+        HashSet<Vector3Int> centersTemp = new HashSet<Vector3Int> { originPoint };
+
+        foreach (var offsetXZ in Directions.Directions2D)
+        {
+            var newBiomePoint1 = new Vector3Int(originPoint.x + offsetXZ.x * biomeLength, 0,
+                originPoint.z + offsetXZ.y * biomeLength);
+            var newBiomePoint2 = new Vector3Int(originPoint.x + offsetXZ.x * biomeLength, 0,
+                originPoint.z + offsetXZ.y * 2 * biomeLength);
+            var newBiomePoint3 = new Vector3Int(originPoint.x + offsetXZ.x * 2 * biomeLength, 0,
+                originPoint.z + offsetXZ.y * biomeLength);
+            var newBiomePoint4 = new Vector3Int(originPoint.x + offsetXZ.x * 2 * biomeLength, 0,
+                originPoint.z + offsetXZ.y * 2 * biomeLength);
+            centersTemp.Add(newBiomePoint1);
+            centersTemp.Add(newBiomePoint2);
+            centersTemp.Add(newBiomePoint3);
+            centersTemp.Add(newBiomePoint4);
+        }
+
+        return new List<Vector3Int>(centersTemp);
     }
 }

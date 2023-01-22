@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 60251132}
   - component: {fileID: 60251131}
   m_Layer: 0
-  m_Name: World
+  m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,20 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b92a5e2f856c2c4aa664ce0df34a571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeInChunks: 10000
   chunkSize: 25
   chunkHeight: 100
   chunkDrawingRange: 10
   mapSeedOffset: {x: 0, y: 0}
   newGame: 0
-  chunkPrefab: {fileID: 4443192061081385954, guid: 1c00b035e263f934a9711fcf71e3336a, type: 3}
-  worldRenderer: {fileID: 1887148051}
-  gameData:
+  terrainRenderer: {fileID: 1887148051}
+  terrainData:
     jsonChunkDataDictionary: 
-    chunkSize: 0
-    chunkHeight: 0
   terrainGenerator: {fileID: 1985401114}
-  OnWorldCreated:
+  OnTerrainCreated:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1345652435}
@@ -208,7 +204,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &189310904
 GameObject:
@@ -284,7 +280,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &546464560
 GameObject:
@@ -316,24 +312,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fileNamePlayerData: player.data
-  fileNameWorldData: world.data
-  fileNameGameData: game.data
+  fileNameTerrainParameters: world.data
+  fileNameTerrainData: game.data
   useEncryption: 0
   playerData:
     playerPosition: {x: 15, y: 15, z: 15}
     spawnPos: {x: 15, y: 15, z: 15}
     playerRotation: {x: 0, y: 0, z: 0, w: 1}
-  worldData:
-    mapSizeInChunk: 1
+  terrainParameters:
     chunkSize: 1
     chunkHeight: 1
     chunkDrawRange: 1
     mapSeedOffset: {x: 0, y: 0}
     tree: 0
-  gameData:
+  terrainData:
     jsonChunkDataDictionary: 
-    chunkSize: 0
-    chunkHeight: 0
 --- !u!4 &546464562
 Transform:
   m_ObjectHideFlags: 0
@@ -347,7 +340,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &578865112
 GameObject:
@@ -886,6 +879,11 @@ Transform:
   m_Father: {fileID: 1804736597}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &983792777 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6512520830912963287, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+  m_PrefabInstance: {fileID: 1734679476}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1047007242
 GameObject:
   m_ObjectHideFlags: 0
@@ -1158,7 +1156,7 @@ GameObject:
   - component: {fileID: 1345652435}
   - component: {fileID: 1345652436}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1177,7 +1175,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1345652435
 MonoBehaviour:
@@ -1194,13 +1192,11 @@ MonoBehaviour:
   gameManager: {fileID: 1345652433}
   playerPrefab: {fileID: 116692708104115924, guid: d43e9bef6cf8dc74dbbc13269406cc57, type: 3}
   currentChunkPosition: {x: 0, y: 0, z: 0}
-  world: {fileID: 60251131}
+  terrain: {fileID: 60251131}
   detectionTime: 1
   voxel: {fileID: 11400000, guid: 5ad09aa0934211246a90353d6fdace9b, type: 2}
   spawnPos: {x: 0, y: 0, z: 0}
   playerPositions: {x: 0, y: 0, z: 0}
-  playerRotation: {x: 0, y: 0, z: 0, w: 0}
-  chunkStorage: {fileID: 210171821}
   newGame: 0
   loadGame: 0
   keyClicked: 0
@@ -1442,10 +1438,26 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_Target
       value: 
       objectReference: {fileID: 60251131}
+    - target: {fileID: 6512520829714086603, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
+      value: GenerateTerrain
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512520829714086603, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_TargetAssemblyTypeName
+      value: Terrain, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 6512520829834006695, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1345652436}
+    - target: {fileID: 6512520829834006695, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TreeEnable
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512520829834006695, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: TreeSwitch, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 6512520830078066471, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1478,6 +1490,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6512520830450061229, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: voxelParameterParent
+      value: 
+      objectReference: {fileID: 983792777}
     - target: {fileID: 6512520830547160835, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1726,6 +1742,10 @@ PrefabInstance:
       propertyPath: worldManager
       value: 
       objectReference: {fileID: 60251131}
+    - target: {fileID: 6512520831162690674, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
+      propertyPath: terrainManager
+      value: 
+      objectReference: {fileID: 60251131}
     - target: {fileID: 6512520831226830527, guid: 10891b62834b4594e87a5aa99168d49a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1918,7 +1938,7 @@ GameObject:
   - component: {fileID: 1887148052}
   - component: {fileID: 1887148051}
   m_Layer: 0
-  m_Name: World Renderer
+  m_Name: Terrain Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1937,7 +1957,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1887148051
 MonoBehaviour:
@@ -1962,7 +1982,7 @@ MeshCollider:
   m_GameObject: {fileID: 1887148049}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
@@ -1974,7 +1994,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1887148049}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -2029,7 +2049,7 @@ GameObject:
   - component: {fileID: 1985401114}
   - component: {fileID: 1985401116}
   m_Layer: 0
-  m_Name: TerrainGenerator
+  m_Name: Terrain Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2073,7 +2093,7 @@ Transform:
   - {fileID: 1804736597}
   - {fileID: 1074215552}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1985401116
 MonoBehaviour:

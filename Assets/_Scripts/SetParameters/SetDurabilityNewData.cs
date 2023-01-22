@@ -18,13 +18,13 @@ public class SetDurabilityNewData : MonoBehaviour
 /// </summary>
     void Start()
     {
-        //for (int i = 0; i < blockParameterParent.transform.childCount; i++)
+        //for (int i = 0; i < voxelParameterParent.transform.childCount; i++)
         //{
-        //    blockDataList.Add(voxel.voxelDataList[i]);
-        //    blockParameters.Add(blockParameterParent.transform.GetChild(i).gameObject);
+        //    voxelDataList.Add(voxel.voxelDataList[i]);
+        //    voxelParameters.Add(voxelParameterParent.transform.GetChild(i).gameObject);
         //    
-        //    blockDataList[i].durability = voxel.voxelDataList[i].durability;
-        //    blockDataList[i].placable = voxel.voxelDataList[i].placable;
+        //    voxelDataList[i].durability = voxel.voxelDataList[i].durability;
+        //    voxelDataList[i].isPlaceable = voxel.voxelDataList[i].isPlaceable;
         //}
         //
         //SetText();
@@ -57,8 +57,8 @@ public class SetDurabilityNewData : MonoBehaviour
 
 /// <summary>
 /// It's a function that is called when a button is clicked. It then checks if the button that was
-/// clicked is the same as the name of the block type in the blockDataList. If it is, it then checks if
-/// the block is placable or not. If it is, it disables the button that says "Place". If it isn't, it
+/// clicked is the same as the name of the block type in the voxelDataList. If it is, it then checks if
+/// the block is isPlaceable or not. If it is, it disables the button that says "Place". If it isn't, it
 /// disables the button that says "Destroy".
 /// </summary>
     public void SetClicked()
@@ -67,7 +67,7 @@ public class SetDurabilityNewData : MonoBehaviour
         {
             if (blockParameters[i].name == blockDataList[i].voxelType.ToString())
             {
-                if(blockDataList[i].placable == true)
+                if(blockDataList[i].isPlaceable == true)
                 {
                     blockParameters[i].transform.GetChild(2).GetComponent<Button>().interactable = false;
                 }
@@ -92,15 +92,15 @@ public class SetDurabilityNewData : MonoBehaviour
             if (currentButton.transform.parent.gameObject.name == blockDataList[i].voxelType.ToString())
             {
                 blockDataList[i].durability = (int)currentButton.transform.GetComponent<Slider>().value;
-//                Text newParameter = blockParameters[i].transform.GetChild(0).GetChild(2).GetComponent<Text>();
-//                blockDataList[i].durability = int.Parse(newParameter.text);
+//                Text newParameter = voxelParameters[i].transform.GetChild(0).GetChild(2).GetComponent<Text>();
+//                voxelDataList[i].durability = int.Parse(newParameter.text);
             }
         }
         //SetText();
     }
 
 /// <summary>
-/// It's a function that sets the placable value of a block to true or false depending on the button
+/// It's a function that sets the isPlaceable value of a block to true or false depending on the button
 /// that was clicked.
 /// </summary>
     public void SetPlacableData()
@@ -112,11 +112,11 @@ public class SetDurabilityNewData : MonoBehaviour
             {
                 if(currentButton.name == "Set On")
                 {
-                    blockDataList[i].placable = true;
+                    blockDataList[i].isPlaceable = true;
                 }
                 else
                 {
-                    blockDataList[i].placable = false;
+                    blockDataList[i].isPlaceable = false;
                 }
             }
         }

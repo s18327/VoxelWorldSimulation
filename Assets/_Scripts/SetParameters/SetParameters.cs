@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 
 public class SetParameters : MonoBehaviour
 {
-    public GameObject worldParameters;
-    public World worldManager;
-    public List<GameObject> inputWorldFields;
+    [FormerlySerializedAs("worldParameters")] public GameObject terrainParameters;
+    public Terrain terrainManager;
+    [FormerlySerializedAs("inputterrainFields")] [FormerlySerializedAs("inputWorldFields")] public List<GameObject> inputTerrainFields;
 
 
     void Start()
@@ -19,71 +20,62 @@ public class SetParameters : MonoBehaviour
     }
 
 
-    public void SetText()
+    private void SetText()
     {
-
-        inputWorldFields[0].GetComponent<InputField>().text = worldManager.mapSizeInChunks.ToString();
-        inputWorldFields[1].GetComponent<InputField>().text = worldManager.chunkSize.ToString();
-        inputWorldFields[2].GetComponent<InputField>().text = worldManager.chunkHeight.ToString();
-        inputWorldFields[3].GetComponent<InputField>().text = worldManager.chunkDrawingRange.ToString();
-        inputWorldFields[4].GetComponent<InputField>().text = worldManager.mapSeedOffset.x.ToString();
-        inputWorldFields[5].GetComponent<InputField>().text = worldManager.mapSeedOffset.y.ToString();
-
+        inputTerrainFields[0].GetComponent<InputField>().text = terrainManager.chunkSize.ToString();
+        inputTerrainFields[1].GetComponent<InputField>().text = terrainManager.chunkHeight.ToString();
+        inputTerrainFields[2].GetComponent<InputField>().text = terrainManager.chunkDrawingRange.ToString();
+        inputTerrainFields[3].GetComponent<InputField>().text = terrainManager.mapSeedOffset.x.ToString();
+        inputTerrainFields[4].GetComponent<InputField>().text = terrainManager.mapSeedOffset.y.ToString();
     }
 
-    public void InitializeParameterFields()
+    private void InitializeParameterFields()
     {
-        for (int i = 0; i < worldParameters.transform.childCount; i++)
+        for (int i = 0; i < terrainParameters.transform.childCount; i++)
         {
-            if (worldParameters.transform.GetChild(i).childCount > 2)
+            if (terrainParameters.transform.GetChild(i).childCount > 2)
             {
-                inputWorldFields.Add(worldParameters.transform.GetChild(i).GetChild(0).gameObject);
-                inputWorldFields.Add(worldParameters.transform.GetChild(i).GetChild(1).gameObject);
+                inputTerrainFields.Add(terrainParameters.transform.GetChild(i).GetChild(0).gameObject);
+                inputTerrainFields.Add(terrainParameters.transform.GetChild(i).GetChild(1).gameObject);
             }
-            else if (worldParameters.transform.GetChild(i).childCount == 2)
+            else if (terrainParameters.transform.GetChild(i).childCount == 2)
             {
-                inputWorldFields.Add(worldParameters.transform.GetChild(i).GetChild(0).gameObject);
+                inputTerrainFields.Add(terrainParameters.transform.GetChild(i).GetChild(0).gameObject);
             }
         }
     }
 
     public void SetParameter()
     {
-        if (EventSystem.current.currentSelectedGameObject.gameObject == inputWorldFields[0].transform.parent.GetChild(1).gameObject)
+
+        if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[0].transform.parent.GetChild(1).gameObject)
         {
-            Text newParameter = inputWorldFields[0].transform.GetChild(2).GetComponent<Text>();
+            Text newParameter = inputTerrainFields[0].transform.GetChild(2).GetComponent<Text>();
             if (newParameter != null && newParameter.text.Length > 0)
-                worldManager.mapSizeInChunks = int.Parse(newParameter.text);
+                terrainManager.chunkSize = int.Parse(newParameter.text);
             return;
         }
-        else if (EventSystem.current.currentSelectedGameObject.gameObject == inputWorldFields[1].transform.parent.GetChild(1).gameObject)
+        if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[1].transform.parent.GetChild(1).gameObject)
         {
-            Text newParameter = inputWorldFields[1].transform.GetChild(2).GetComponent<Text>();
+            Text newParameter = inputTerrainFields[1].transform.GetChild(2).GetComponent<Text>();
             if (newParameter != null && newParameter.text.Length > 0)
-                worldManager.chunkSize = int.Parse(newParameter.text);
+                terrainManager.chunkHeight = int.Parse(newParameter.text);
+            
             return;
         }
-        else if (EventSystem.current.currentSelectedGameObject.gameObject == inputWorldFields[2].transform.parent.GetChild(1).gameObject)
+        if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[2].transform.parent.GetChild(1).gameObject)
         {
-            Text newParameter = inputWorldFields[2].transform.GetChild(2).GetComponent<Text>();
+            Text newParameter = inputTerrainFields[2].transform.GetChild(2).GetComponent<Text>();
             if (newParameter != null && newParameter.text.Length > 0)
-                worldManager.chunkHeight = int.Parse(newParameter.text);
-            //SettingsService.instance.chunkHeight;
+                terrainManager.chunkDrawingRange = int.Parse(newParameter.text);
             return;
         }
-        else if (EventSystem.current.currentSelectedGameObject.gameObject == inputWorldFields[3].transform.parent.GetChild(1).gameObject)
+        if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[3].transform.parent.GetChild(2).gameObject)
         {
-            Text newParameter = inputWorldFields[3].transform.GetChild(2).GetComponent<Text>();
-            if (newParameter != null && newParameter.text.Length > 0)
-                worldManager.chunkDrawingRange = int.Parse(newParameter.text);
-            return;
-        }
-        else if (EventSystem.current.currentSelectedGameObject.gameObject == inputWorldFields[4].transform.parent.GetChild(2).gameObject)
-        {
-            Text xParameter = inputWorldFields[4].transform.GetChild(2).GetComponent<Text>();
-            Text yParameter = inputWorldFields[5].transform.GetChild(2).GetComponent<Text>();
+            Text xParameter = inputTerrainFields[3].transform.GetChild(2).GetComponent<Text>();
+            Text yParameter = inputTerrainFields[4].transform.GetChild(2).GetComponent<Text>();
             if (xParameter != null && yParameter != null && xParameter.text.Length > 0 && yParameter.text.Length > 0)
-                worldManager.mapSeedOffset = new Vector2Int(int.Parse(xParameter.text), int.Parse(yParameter.text));
+                terrainManager.mapSeedOffset = new Vector2Int(int.Parse(xParameter.text), int.Parse(yParameter.text));
             return;
         }
         SetText();

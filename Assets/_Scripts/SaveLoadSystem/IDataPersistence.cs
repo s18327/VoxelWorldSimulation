@@ -7,9 +7,9 @@ public interface IDataPersistence
     void LoadPlayerData(PlayerData data);
     void SavePlayerData(PlayerData data);
 
-    void LoadWorldData(WorldData data);
-    void SaveWorldData(WorldData data);
+    void LoadTerrainParameters(TerrainParameters data);
+    void SaveTerrainParameters(TerrainParameters data);
 
-    void LoadGameData(GameData data);
-    void SaveGameData(GameData data);
+    void LoadTerrainData(TerrainData data);
+    void SaveTerrainData(TerrainData data);
 }

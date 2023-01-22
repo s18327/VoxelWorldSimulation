@@ -2,36 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 
 /* It's a class that holds a dictionary of chunk data, a dictionary of chunk renderers, a json string
 of the chunk data dictionary, the chunk size, and the chunk height */
 [Serializable]
-public class GameData
+public class TerrainData
 {
-    public Dictionary<Vector3Int, ChunkData> chunkDataDictionary;
+    public Dictionary<Vector3Int, Chunk> chunkDataDictionary;
     public Dictionary<Vector3Int, ChunkRenderer> chunkDictionary;
     public string jsonChunkDataDictionary;
-    public int chunkSize;
-    public int chunkHeight;
 }
 
 
-/* It's a class that holds all the data that is needed to create a world */
+/* It's a class that holds all the data that is needed to create a terrain */
 [Serializable]
-public class WorldData
+public class TerrainParameters
 {
-    public int mapSizeInChunk;
     public int chunkSize;
     public int chunkHeight;
     public int chunkDrawRange;
     public Vector2Int mapSeedOffset;
     public bool tree;
 
-    public WorldData()
+    public TerrainParameters()
     {
-        mapSizeInChunk = 1;
         chunkSize = 1;
         chunkHeight = 1;
         chunkDrawRange = 1;
@@ -65,9 +61,9 @@ public class VoxelData
     public VoxelType voxelType;
     public Vector2Int up, down, side;
     public bool isSolid = true;
-    public bool generatesCollider = true;
+    public bool isGeneratingCollider = true;
     public int durability = 1;
-    public bool placable = true;
+    public bool isPlaceable = true;
 }
 
 
@@ -75,11 +71,10 @@ public class VoxelData
 create, a list of chunk positions to remove, a list of chunk data to remove, and a list of chunk
 positions to update. */
 [Serializable]
-public struct WorldGenerationData
+public struct TerrainGenerationData
 {
     public List<Vector3Int> chunkPositionsToCreate;
     public List<Vector3Int> chunkDataPositionsToCreate;
     public List<Vector3Int> chunkPositionsToRemove;
     public List<Vector3Int> chunkDataToRemove;
-    public List<Vector3Int> chunkPositionsToUpdate;
 }

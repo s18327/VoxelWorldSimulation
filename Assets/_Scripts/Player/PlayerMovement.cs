@@ -47,9 +47,10 @@ public class PlayerMovement : MonoBehaviour
 /// The direction of the movement.
 /// </returns>
     private Vector3 GetMovementDirection(Vector3 movementInput)
-    {
-        return transform.right * movementInput.x + transform.forward * movementInput.z;
-    }
+{
+    var transform1 = transform;
+    return transform1.right * movementInput.x + transform1.forward * movementInput.z;
+}
 
 /// <summary>
 /// If the player is pressing the ascend button, add the up vector to the movement direction, otherwise
@@ -72,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
         {
             movementDirection -= Vector3.up * flySpeed;
         }
-        controller.Move(movementDirection * (playerSpeed * Time.deltaTime));
+        controller.Move(movementDirection * (playerRunSpeed * Time.deltaTime));
     }
 
 /// <summary>

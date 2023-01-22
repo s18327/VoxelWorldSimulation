@@ -8,27 +8,27 @@ using System.IO;
 public class FileDataHandler
 {
     private string playerDataDirPath = "";
-    private string worldDataDirPath = "";
-    private string gameDataDirPath = "";
+    private string terrainParametersDirPath = "";
+    private string terrainDataDirPath = "";
 
     private string playerDataFileName = "";
-    private string worldDataFileName = "";
-    private string gameDataFileName = "";
+    private string terrainParametersFileName = "";
+    private string terrainDataFileName = "";
 
 
 
-    private bool useEncryption = false;
+    private bool useEncryption;
     private readonly string encryptionCodeWord = "word";
 
-    public FileDataHandler(string dataDirPath, string playerDataFileName, string worldDataFileName,string gameDataFileName, bool useEncryption)
+    public FileDataHandler(string dataDirPath, string playerDataFileName, string terrainParametersFileName,string terrainDataFileName, bool useEncryption)
     {
-        this.playerDataDirPath = dataDirPath;
-        this.worldDataDirPath = dataDirPath;
-        this.gameDataDirPath = dataDirPath;
+        playerDataDirPath = dataDirPath;
+        terrainParametersDirPath = dataDirPath;
+        terrainDataDirPath = dataDirPath;
 
         this.playerDataFileName = playerDataFileName;
-        this.worldDataFileName = worldDataFileName;
-        this.gameDataFileName = gameDataFileName;
+        this.terrainParametersFileName = terrainParametersFileName;
+        this.terrainDataFileName = terrainDataFileName;
 
         this.useEncryption = useEncryption;
     }
@@ -42,108 +42,102 @@ public class FileDataHandler
     /// </returns>
     public PlayerData LoadPlayerData()
     {
-        string fullPath = Path.Combine(playerDataDirPath, playerDataFileName);
+        var fullPath = Path.Combine(playerDataDirPath, playerDataFileName);
         PlayerData loadedData = null;
-        if (File.Exists(fullPath))
+        if (!File.Exists(fullPath)) return null;
+        try
         {
-            try
+            var dataToLoad = "";
+            using (var stream = new FileStream(fullPath, FileMode.Open))
             {
-                string dataToLoad = "";
-                using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+                using (var reader = new StreamReader(stream))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        dataToLoad = reader.ReadToEnd();
-                    }
+                    dataToLoad = reader.ReadToEnd();
                 }
-
-                if (useEncryption)
-                {
-                    dataToLoad = EncryptDecrypt(dataToLoad);
-                }
-
-                loadedData = JsonUtility.FromJson<PlayerData>(dataToLoad);
             }
-            catch (Exception e)
+
+            if (useEncryption)
             {
-                Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
+                dataToLoad = EncryptDecrypt(dataToLoad);
             }
+
+            loadedData = JsonUtility.FromJson<PlayerData>(dataToLoad);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
         }
         return loadedData;
     }
 /// <summary>
 /// It checks if the file exists, if it does, it reads the file, decrypts it if necessary, and then
-/// converts the string into a WorldData object
+/// converts the string into a TerrainParameters object
 /// </summary>
 /// <returns>
-/// The WorldData object is being returned.
+/// The TerrainParameters object is being returned.
 /// </returns>
-    public WorldData LoadWorldData()
+    public TerrainParameters LoadTerrainParameters()
     {
-        string fullPath = Path.Combine(worldDataDirPath, worldDataFileName);
-        WorldData loadedData = null;
-        if (File.Exists(fullPath))
+        var fullPath = Path.Combine(terrainParametersDirPath, terrainParametersFileName);
+        TerrainParameters loadedData = null;
+        if (!File.Exists(fullPath)) return null;
+        try
         {
-            try
+            string dataToLoad;
+            using (var stream = new FileStream(fullPath, FileMode.Open))
             {
-                string dataToLoad = "";
-                using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+                using (var reader = new StreamReader(stream))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        dataToLoad = reader.ReadToEnd();
-                    }
+                    dataToLoad = reader.ReadToEnd();
                 }
-
-                if (useEncryption)
-                {
-                    dataToLoad = EncryptDecrypt(dataToLoad);
-                }
-
-                loadedData = JsonUtility.FromJson<WorldData>(dataToLoad);
             }
-            catch (Exception e)
+
+            if (useEncryption)
             {
-                Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
+                dataToLoad = EncryptDecrypt(dataToLoad);
             }
+
+            loadedData = JsonUtility.FromJson<TerrainParameters>(dataToLoad);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
         }
         return loadedData;
     }
 /// <summary>
 /// It checks if the file exists, if it does, it reads the file, decrypts it if necessary, and then
-/// converts the string into a GameData object
+/// converts the string into a TerrainData object
 /// </summary>
 /// <returns>
-/// The GameData class is being returned.
+/// The TerrainData class is being returned.
 /// </returns>
-    public GameData LoadGameData()
+    public TerrainData LoadTerrainData()
     {
-        string fullPath = Path.Combine(gameDataDirPath, gameDataFileName);
-        GameData loadedData = null;
-        if (File.Exists(fullPath))
+        var fullPath = Path.Combine(terrainDataDirPath, terrainDataFileName);
+        TerrainData loadedData = null;
+        if (!File.Exists(fullPath)) return null;
+        try
         {
-            try
+            string dataToLoad;
+            using (var stream = new FileStream(fullPath, FileMode.Open))
             {
-                string dataToLoad = "";
-                using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+                using (var reader = new StreamReader(stream))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        dataToLoad =  reader.ReadToEnd();
-                    }
+                    dataToLoad =  reader.ReadToEnd();
                 }
-
-                if (useEncryption)
-                {
-                    dataToLoad = EncryptDecrypt(dataToLoad);
-                }
-
-                loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
             }
-            catch (Exception e)
+
+            if (useEncryption)
             {
-                Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
+                dataToLoad = EncryptDecrypt(dataToLoad);
             }
+
+            loadedData = JsonUtility.FromJson<TerrainData>(dataToLoad);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
         }
         return loadedData;
     }
@@ -154,15 +148,15 @@ public class FileDataHandler
 /// It takes the data from the PlayerData class and converts it to a JSON string, then it encrypts it
 /// and writes it to a file.
 /// </summary>
-/// <param name="PlayerData">This is the class that contains all the data that you want to save.</param>
-    public void SavePlayerData(PlayerData data)
+/// <param name="playerData">This is the class that contains all the data that you want to save.</param>
+    public void SavePlayerData(PlayerData playerData)
     {
-        string fullPath = Path.Combine(playerDataDirPath, playerDataFileName);
+        var fullPath = Path.Combine(playerDataDirPath, playerDataFileName);
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
-            string dataToStore = JsonUtility.ToJson(data, true);
+            var dataToStore = JsonUtility.ToJson(playerData, true);
 
 
             if (useEncryption)
@@ -170,9 +164,9 @@ public class FileDataHandler
                 dataToStore = EncryptDecrypt(dataToStore);
             }
 
-            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+            using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                using (StreamWriter writer = new StreamWriter(stream))
+                using (var writer = new StreamWriter(stream))
                 {
                     writer.Write(dataToStore);
                 }
@@ -184,12 +178,12 @@ public class FileDataHandler
         }
     }
 /// <summary>
-/// It takes a WorldData object, converts it to a JSON string, encrypts it, and writes it to a file
+/// It takes a TerrainParameters object, converts it to a JSON string, encrypts it, and writes it to a file
 /// </summary>
-/// <param name="WorldData">This is the data that you want to save.</param>
-    public void SaveWorldData(WorldData data)
+/// <param name="data">This is the data that you want to save.</param>
+    public void SaveTerrainParameters(TerrainParameters data)
     {
-        string fullPath = Path.Combine(worldDataDirPath, worldDataFileName);
+        var fullPath = Path.Combine(terrainParametersDirPath, terrainParametersFileName);
         try
         { 
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
@@ -200,9 +194,9 @@ public class FileDataHandler
             {
                 dataToStore = EncryptDecrypt(dataToStore);
             }
-            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+            using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                using (StreamWriter writer = new StreamWriter(stream))
+                using (var writer = new StreamWriter(stream))
                 {
                     writer.Write(dataToStore);
                 }
@@ -216,23 +210,23 @@ public class FileDataHandler
 /// <summary>
 /// It creates a new file in the specified directory, and writes the encrypted data to it
 /// </summary>
-/// <param name="GameData">This is the class that contains all the data that you want to save.</param>
-    public void SaveGameData(GameData data)
+/// <param name="terrainData">This is the class that contains all the data that you want to save.</param>
+    public void SaveTerrainData(TerrainData terrainData)
     {
-        string fullPath = Path.Combine(gameDataDirPath, gameDataFileName);
+        var fullPath = Path.Combine(terrainDataDirPath, terrainDataFileName);
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
-            string dataToStore = JsonUtility.ToJson(data, true);
+            var dataToStore = JsonUtility.ToJson(terrainData, true);
 
             if (useEncryption)
             {
                 dataToStore = EncryptDecrypt(dataToStore);
             }
-            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+            using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                using (StreamWriter writer = new StreamWriter(stream))
+                using (var writer = new StreamWriter(stream))
                 {
                     writer.Write(dataToStore);
                 }
@@ -257,8 +251,8 @@ public class FileDataHandler
 /// </returns>
     private string EncryptDecrypt(string data)
     {
-        string modifiedData = "";
-        for (int i = 0; i < data.Length; i++)
+        var modifiedData = "";
+        for (var i = 0; i < data.Length; i++)
         {
             modifiedData += (char)(data[i] ^ encryptionCodeWord[i % encryptionCodeWord.Length]);
         }

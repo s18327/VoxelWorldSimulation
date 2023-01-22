@@ -12,25 +12,25 @@ public class StoneLayerHandler : LayerHandler
 
     public DomainWarping domainWarping;
 
-    protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
+    protected override bool TryHandling(Chunk chunk, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
     {
-        if (chunkData.worldPosition.y > surfaceHeightNoise)
+        if (chunk.terrainPosition.y > surfaceHeightNoise)
             return false;
 
-        stoneNoiseSettings.worldOffset = mapSeedOffset;
-        float stoneNoise = domainWarping.GenerateDomainNoise(chunkData.worldPosition.x + x, chunkData.worldPosition.z + z, stoneNoiseSettings);
+        stoneNoiseSettings.terrainOffset = mapSeedOffset;
+        float stoneNoise = domainWarping.GenerateDomainNoise(chunk.terrainPosition.x + x, chunk.terrainPosition.z + z, stoneNoiseSettings);
         int endPosition = surfaceHeightNoise;
-        if (chunkData.worldPosition.y < 0)
+        if (chunk.terrainPosition.y < 0)
         {
-            endPosition = chunkData.worldPosition.y + chunkData.chunkHeight;
+            endPosition = chunk.terrainPosition.y + chunk.chunkHeight;
         }
 
         if (!(stoneNoise > stoneThreshold)) return false;
         
-        for (int i = chunkData.worldPosition.y; i <= endPosition; i++)
+        for (int i = chunk.terrainPosition.y; i <= endPosition; i++)
         {
             Vector3Int pos = new Vector3Int(x, i, z);
-            Chunk.SetBlock(chunkData, pos, VoxelType.Stone);
+            ChunkHelper.SetVoxel(chunk, pos, VoxelType.Stone);
         }
         return true;
     }

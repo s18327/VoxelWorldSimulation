@@ -6,11 +6,11 @@ using UnityEngine.Serialization;
 public class SurfaceLayerHandler : LayerHandler
 {
     public VoxelType surfaceVoxelType;
-    protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
+    protected override bool TryHandling(Chunk chunk, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
     {
-        if (y != surfaceHeightNoise) return false; //TODO: Make sure it is not lower than water 
+        if (y != surfaceHeightNoise) return false;
         Vector3Int pos = new Vector3Int(x, y, z);
-        Chunk.SetBlock(chunkData, pos, surfaceVoxelType);
+        ChunkHelper.SetVoxel(chunk, pos, surfaceVoxelType);
         return true;
     }
 }

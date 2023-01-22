@@ -47,40 +47,40 @@ public class TreeLayerHandler : LayerHandler
     };
 
 /// <summary>
-/// If the chunk is above the surface, and the chunk has a tree at the current position, and the block
+/// If the chunk is above the surface, and the chunk has a tree at the current position, and the voxel
 /// at the current position is grass, then replace the grass with dirt, and place a tree trunk and
 /// leaves
 /// </summary>
-/// <param name="chunkData">The chunk data that is being used.</param>
-/// <param name="x">The x position of the block in the chunk.</param>
-/// <param name="y">The y coordinate of the block in the chunk.</param>
-/// <param name="z">The z coordinate of the block in the chunk.</param>
+/// <param name="chunk">The chunk data that is being used.</param>
+/// <param name="x">The x position of the voxel in the chunk.</param>
+/// <param name="y">The y coordinate of the voxel in the chunk.</param>
+/// <param name="z">The z coordinate of the voxel in the chunk.</param>
 /// <param name="surfaceHeightNoise">The height of the surface at the current position.</param>
 /// <param name="mapSeedOffset">The offset for the map seed.</param>
 /// <returns>
 /// The return value is a boolean.
 /// </returns>
-    protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
+    protected override bool TryHandling(Chunk chunk, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
     {
-        if (chunkData.worldPosition.y < 0)
+        if (chunk.terrainPosition.y < 0)
             return false;
         if (!(surfaceHeightNoise < terrainHeightLimit)
-            || !chunkData.treeData.treePositions.Contains(new Vector2Int(chunkData.worldPosition.x + x,
-                chunkData.worldPosition.z + z))) return false;
+            || !chunk.treeData.treePositions.Contains(new Vector2Int(chunk.terrainPosition.x + x,
+                chunk.terrainPosition.z + z))) return false;
         
         Vector3Int chunkCoordinates = new Vector3Int(x, surfaceHeightNoise, z);
-        VoxelType type = Chunk.GetBlockFromChunkCoordinates(chunkData, chunkCoordinates);
+        VoxelType type = ChunkHelper.GetVoxelFromChunkCoordinates(chunk, chunkCoordinates);
         if (type != VoxelType.Grass) return false;
         
-        Chunk.SetBlock(chunkData, chunkCoordinates, VoxelType.Dirt);
+        ChunkHelper.SetVoxel(chunk, chunkCoordinates, VoxelType.Dirt);
         for (int i = 1; i < 5; i++)
         {
             chunkCoordinates.y = surfaceHeightNoise + i;
-            Chunk.SetBlock(chunkData, chunkCoordinates, VoxelType.TreeTrunk);
+            ChunkHelper.SetVoxel(chunk, chunkCoordinates, VoxelType.TreeTrunk);
         }
         foreach (Vector3Int leafPosition in treeLeavesStaticLayout)
         {
-            chunkData.treeData.treeLeaves.Add(new Vector3Int(x + leafPosition.x, surfaceHeightNoise + 5 + leafPosition.y, z + leafPosition.z));
+            chunk.treeData.treeLeaves.Add(new Vector3Int(x + leafPosition.x, surfaceHeightNoise + 5 + leafPosition.y, z + leafPosition.z));
         }
         return false;
     }

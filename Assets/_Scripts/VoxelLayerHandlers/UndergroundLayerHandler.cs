@@ -5,12 +5,12 @@ using UnityEngine.Serialization;
 
 public class UndergroundLayerHandler : LayerHandler
 {
-    [FormerlySerializedAs("undergroundBlockType")] public VoxelType undergroundVoxelType;
-    protected override bool TryHandling(ChunkData chunkData, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
+    public VoxelType undergroundVoxelType;
+    protected override bool TryHandling(Chunk chunk, int x, int y, int z, int surfaceHeightNoise, Vector2Int mapSeedOffset)
     {
         if (y >= surfaceHeightNoise) return false;
-        Vector3Int pos = new Vector3Int(x, y - chunkData.worldPosition.y, z);
-        Chunk.SetBlock(chunkData, pos, undergroundVoxelType);
+        Vector3Int pos = new Vector3Int(x, y - chunk.terrainPosition.y, z);
+        ChunkHelper.SetVoxel(chunk, pos, undergroundVoxelType);
         return true;
     }
 }

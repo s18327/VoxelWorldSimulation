@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,24 +7,21 @@ public class Toolbar : MonoBehaviour
     public PlayerInput playerInput;
     public RectTransform highlight;
     public ItemSlot[] itemSlots;
-
-
-
-
+    
     public void Create()
     {
 
         var player = GameObject.FindWithTag("Player");
         playerInput = player.GetComponent<PlayerInput>();
-        playerInput.BlockTypeNumberSelected = 0;
+        playerInput.VoxelTypeNumberSelected = 0;
     }
 
     private void Update()
     {
 
-        if (GetBlockTypeSelected().Equals(true))
+        if (GetVoxelTypeSelected().Equals(true))
         {
-            highlight.position = itemSlots[playerInput.BlockTypeNumberSelected].icon.transform.position;
+            highlight.position = itemSlots[playerInput.VoxelTypeNumberSelected].icon.transform.position;
         }
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -34,22 +29,22 @@ public class Toolbar : MonoBehaviour
         
         if (scroll > 0)
         {
-            playerInput.BlockTypeNumberSelected -= 1;
+            playerInput.VoxelTypeNumberSelected -= 1;
         }
-        else { playerInput.BlockTypeNumberSelected += 1; }
+        else { playerInput.VoxelTypeNumberSelected += 1; }
 
-        if (playerInput.BlockTypeNumberSelected > itemSlots.Length - 1) playerInput.BlockTypeNumberSelected = 0;
+        if (playerInput.VoxelTypeNumberSelected > itemSlots.Length - 1) playerInput.VoxelTypeNumberSelected = 0;
 
-        if (playerInput.BlockTypeNumberSelected < 0) playerInput.BlockTypeNumberSelected = itemSlots.Length - 1;
+        if (playerInput.VoxelTypeNumberSelected < 0) playerInput.VoxelTypeNumberSelected = itemSlots.Length - 1;
 
-        highlight.position = itemSlots[playerInput.BlockTypeNumberSelected].icon.transform.position;
+        highlight.position = itemSlots[playerInput.VoxelTypeNumberSelected].icon.transform.position;
     }
-    private bool GetBlockTypeSelected()
+    private bool GetVoxelTypeSelected()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { playerInput.BlockTypeNumberSelected = 0; return true; }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) { playerInput.BlockTypeNumberSelected = 1; return true; }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) { playerInput.BlockTypeNumberSelected = 2; return true; }
-        if (Input.GetKeyDown(KeyCode.Alpha4)) { playerInput.BlockTypeNumberSelected = 3; return true; }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) { playerInput.VoxelTypeNumberSelected = 0; return true; }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) { playerInput.VoxelTypeNumberSelected = 1; return true; }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) { playerInput.VoxelTypeNumberSelected = 2; return true; }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) { playerInput.VoxelTypeNumberSelected = 3; return true; }
         return false;
     }
 }
@@ -57,8 +52,5 @@ public class Toolbar : MonoBehaviour
 [System.Serializable]
 public class ItemSlot
 {
-
-    public int itemID;
     public Image icon;
-
 }

@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public Vector3Int currentChunkPosition;
     private Vector3Int currentChunkCenter = zero;
 
-    public World world;
+    public Terrain terrain;
 
     public float detectionTime = 1;
 
@@ -22,9 +22,7 @@ public class GameManager : MonoBehaviour
 
     public Vector3 spawnPos;
     public Vector3 playerPositions;
-    public Quaternion playerRotation;
 
-    public Transform chunkStorage;
     public bool newGame;
     public bool loadGame;
 
@@ -59,7 +57,7 @@ void Update()
         }
         else if (newGame)
         {
-            this.gameObject.transform.position = new Vector3Int(world.chunkSize / 2, 100, world.chunkSize / 2);
+            this.gameObject.transform.position = new Vector3Int(terrain.chunkSize / 2, 100, terrain.chunkSize / 2);
            // newGame = false;
         }
         else if (player != null)
@@ -161,12 +159,12 @@ void Update()
     {
         yield return new WaitForSeconds(detectionTime);
         if (
-            Mathf.Abs(currentChunkCenter.x - player.transform.position.x) > world.chunkSize ||
-            Mathf.Abs(currentChunkCenter.z - player.transform.position.z) > world.chunkSize ||
-            (Mathf.Abs(currentChunkPosition.y - player.transform.position.y) > world.chunkHeight)
+            Mathf.Abs(currentChunkCenter.x - player.transform.position.x) > terrain.chunkSize ||
+            Mathf.Abs(currentChunkCenter.z - player.transform.position.z) > terrain.chunkSize ||
+            (Mathf.Abs(currentChunkPosition.y - player.transform.position.y) > terrain.chunkHeight)
             )
         {
-            world.RequestAdditionalChunkLoad(player);
+            terrain.RequestAdditionalChunkLoad(player);
 
         }
         else
@@ -179,8 +177,8 @@ void Update()
 /// <summary>
 /// "Set the current chunk coordinates to the chunk that the player is currently in."
 /// 
-/// The first line of the function is a call to a function in the WorldDataHelper class. This function
-/// takes the world and the player's position as parameters and returns the chunk coordinates of the
+/// The first line of the function is a call to a function in the TerrainHelper class. This function
+/// takes the terrain and the player's position as parameters and returns the chunk coordinates of the
 /// chunk that the player is currently in.
 /// 
 /// The next two lines set the x and z coordinates of the currentChunkCenter variable to the center of
@@ -188,9 +186,9 @@ void Update()
 /// </summary>
     private void SetCurrentChunkCoordinates()
     {
-        currentChunkPosition = WorldDataHelper.GetChunkPositionFromVoxelCoordinates(world, RoundToInt(player.transform.position));
-        currentChunkCenter.x = currentChunkPosition.x + world.chunkSize / 2;
-        currentChunkCenter.z = currentChunkPosition.z + world.chunkSize / 2;
+        currentChunkPosition = TerrainHelper.GetChunkPositionFromVoxelCoordinates(terrain, RoundToInt(player.transform.position));
+        currentChunkCenter.x = currentChunkPosition.x + terrain.chunkSize / 2;
+        currentChunkCenter.z = currentChunkPosition.z + terrain.chunkSize / 2;
     }
 
 }

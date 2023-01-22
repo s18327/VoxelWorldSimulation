@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,7 +8,7 @@ public class NoiseSettings : ScriptableObject
     public float noiseZoom;
     public int octaves; 
     public Vector2Int offset;
-    public Vector2Int worldOffset;
+    public Vector2Int terrainOffset;
     public float persistence;
     public float redistributionModifier;
     public float exponent;
