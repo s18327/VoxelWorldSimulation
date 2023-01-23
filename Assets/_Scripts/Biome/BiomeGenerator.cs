@@ -82,11 +82,11 @@ public class BiomeGenerator : MonoBehaviour
     public int GetSurfaceHeight(int x, int z, int chunkHeight)
     {
         var terrainHeight = domainWarpingEnabled == false
-            ? MyOctavePerlin.OctavePerlin(x, z, biomeNoiseSettings)
+            ? Noise.GetNoise(x, z, biomeNoiseSettings)
             : domainWarping.GenerateDomainNoise(x, z, biomeNoiseSettings);
 
-        terrainHeight = MyOctavePerlin.Redistribution(terrainHeight, biomeNoiseSettings);
-        return MyOctavePerlin.RemapValueToInt(terrainHeight, 0, chunkHeight);
+        terrainHeight = Noise.Redistribution(terrainHeight, biomeNoiseSettings);
+        return Noise.RemapValueToInt(terrainHeight, 0, chunkHeight);
     }
     
     /// <summary>
@@ -95,13 +95,13 @@ public class BiomeGenerator : MonoBehaviour
     /// </summary>
     /// <param name="playerPosition">playerPosition</param>
     /// <param name="drawRange">The number of biomes to draw in each direction.</param>
-    /// <param name="mapSize">The size of the map in chunks.</param>
+    /// <param name="chunkSize">The size of the map in chunks.</param>
     /// <returns>
     /// A list of Vector3Ints
     /// </returns>
-    public static List<Vector3Int> CalculateBiomeCenters(Vector3 playerPosition, int drawRange, int mapSize)
+    public static List<Vector3Int> CalculateBiomeCenters(Vector3 playerPosition, int drawRange, int chunkSize)
     {
-        int biomeLength = drawRange * mapSize;
+        int biomeLength = drawRange * chunkSize;
 
         Vector3Int originPoint = new Vector3Int(
             Mathf.RoundToInt(playerPosition.x / biomeLength) * biomeLength,

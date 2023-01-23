@@ -110,7 +110,7 @@ public class TerrainGenerator : MonoBehaviour
     private List<float> CalculateBiomeNoise(List<Vector3Int> biomeCenters, Vector2Int mapSeedOffset)
     {
         biomeNoiseSettings.terrainOffset = mapSeedOffset;
-        return biomeCenters.Select(center => MyOctavePerlin.OctavePerlin(center.x, center.y, biomeNoiseSettings)).ToList();
+        return biomeCenters.Select(center => Noise.GetNoise(center.x, center.y, biomeNoiseSettings)).ToList();
     }
 
     private void OnDrawGizmos()

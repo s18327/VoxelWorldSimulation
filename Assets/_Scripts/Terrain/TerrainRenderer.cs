@@ -34,7 +34,7 @@ public class TerrainRenderer : MonoBehaviour
             chunk = objectInstance.GetComponent<ChunkRenderer>();
         }
 
-        chunk.InitializeChunk(terrainData.chunkDataDictionary[position]);
+        chunk.InitializeChunk(terrainData.chunkDictionary[position]);
         chunk.UpdateChunk(mesh);
         chunk.gameObject.SetActive(true);
         return chunk;

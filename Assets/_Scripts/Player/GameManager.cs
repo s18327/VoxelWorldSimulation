@@ -186,7 +186,7 @@ void Update()
 /// </summary>
     private void SetCurrentChunkCoordinates()
     {
-        currentChunkPosition = TerrainHelper.GetChunkPositionFromVoxelCoordinates(terrain, RoundToInt(player.transform.position));
+        currentChunkPosition = TerrainHelper.GetChunkPositionFromCoordinates(terrain, RoundToInt(player.transform.position));
         currentChunkCenter.x = currentChunkPosition.x + terrain.chunkSize / 2;
         currentChunkCenter.z = currentChunkPosition.z + terrain.chunkSize / 2;
     }

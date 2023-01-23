@@ -10,8 +10,8 @@ of the chunk data dictionary, the chunk size, and the chunk height */
 [Serializable]
 public class TerrainData
 {
-    public Dictionary<Vector3Int, Chunk> chunkDataDictionary;
-    public Dictionary<Vector3Int, ChunkRenderer> chunkDictionary;
+    public Dictionary<Vector3Int, Chunk> chunkDictionary;
+    public Dictionary<Vector3Int, ChunkRenderer> chunkRendererDictionary;
     public string jsonChunkDataDictionary;
 }
 
@@ -24,7 +24,6 @@ public class TerrainParameters
     public int chunkHeight;
     public int chunkDrawRange;
     public Vector2Int mapSeedOffset;
-    public bool tree;
 
     public TerrainParameters()
     {
@@ -32,7 +31,6 @@ public class TerrainParameters
         chunkHeight = 1;
         chunkDrawRange = 1;
         mapSeedOffset = Vector2Int.zero;
-        tree = false;
     }
 }
 

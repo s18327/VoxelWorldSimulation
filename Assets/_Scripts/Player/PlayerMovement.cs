@@ -78,28 +78,9 @@ public class PlayerMovement : MonoBehaviour
 
 /// <summary>
 /// It takes in a Vector3 and a boolean, and returns a Vector3.
-/// 
 /// The Vector3 is the direction the player is moving in, and the boolean is whether or not the player
 /// is running.
-/// 
-/// The function then returns a Vector3 that is the direction the player is moving in.
-/// 
-/// The function also moves the player in that direction.
-/// 
-/// The function also takes into account the speed of the player.
-/// 
-/// The function also takes into account the speed of the player when running.
-/// 
-/// The function also takes into account the time since the last frame.
-/// 
-/// The function also takes into account the time since the last frame when running.
-/// 
-/// The function also takes into account the time since the last frame when running and moving.
-/// 
-/// The function also takes into account the time since the last frame when running and moving and the
-/// speed of the
-/// </summary>
-/// <param name="Vector3">movementInput</param>
+/// <param name="movementInput">movementInput</param>
 /// <param name="runningInput">A boolean that is true if the player is running, false if they are
 /// walking.</param>
     public void Walk(Vector3 movementInput, bool runningInput)

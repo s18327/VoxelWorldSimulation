@@ -11,17 +11,17 @@ public static class TerrainHelper
     /// contains that voxel
     /// </summary>
     /// <param name="terrain">The terrain object that contains the chunk</param>
-    /// <param name="terrainVoxelPosition">The position of the voxel in terrain space.</param>
+    /// <param name="position">The position of the voxel in terrain space.</param>
     /// <returns>
     /// A Vector3Int
     /// </returns>
-    public static Vector3Int GetChunkPositionFromVoxelCoordinates(Terrain terrain, Vector3Int terrainVoxelPosition)
+    public static Vector3Int GetChunkPositionFromCoordinates(Terrain terrain, Vector3Int position)
     {
         return new Vector3Int
         {
-            x = Mathf.FloorToInt(terrainVoxelPosition.x / (float)terrain.chunkSize) * terrain.chunkSize,
-            y = Mathf.FloorToInt(terrainVoxelPosition.y / (float)terrain.chunkHeight) * terrain.chunkHeight,
-            z = Mathf.FloorToInt(terrainVoxelPosition.z / (float)terrain.chunkSize) * terrain.chunkSize
+            x = Mathf.FloorToInt(position.x / (float)terrain.chunkSize) * terrain.chunkSize,
+            y = Mathf.FloorToInt(position.y / (float)terrain.chunkHeight) * terrain.chunkHeight,
+            z = Mathf.FloorToInt(position.z / (float)terrain.chunkSize) * terrain.chunkSize
         };
     }
 
@@ -46,7 +46,7 @@ public static class TerrainHelper
             for (int z = startZ; z <= endZ; z += terrain.chunkSize)
             {
                 Vector3Int chunkPositionFromVoxelCoordinates =
-                    GetChunkPositionFromVoxelCoordinates(terrain, new Vector3Int(x, 0, z));
+                    GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, 0, z));
                 listOfChunkPositionsAroundThePlayer.Add(chunkPositionFromVoxelCoordinates);
                 if (x < playerPosition.x - terrain.chunkSize
                     || x > playerPosition.x + terrain.chunkSize
@@ -56,7 +56,7 @@ public static class TerrainHelper
                 for (int y = -terrain.chunkHeight; y >= playerPosition.y - terrain.chunkHeight * 2; y -= terrain.chunkHeight)
                 {
                     chunkPositionFromVoxelCoordinates =
-                        GetChunkPositionFromVoxelCoordinates(terrain, new Vector3Int(x, y, z));
+                        GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, y, z));
                     listOfChunkPositionsAroundThePlayer.Add(chunkPositionFromVoxelCoordinates);
                 }
             }
@@ -72,7 +72,7 @@ public static class TerrainHelper
     /// <param name="pos">The position of the chunk.</param>
     internal static void RemoveChunkData(Terrain terrain, Vector3Int pos)
     {
-        terrain.terrainData.chunkDataDictionary.Remove(pos);
+        terrain.terrainData.chunkDictionary.Remove(pos);
     }
 
     /// <summary>
@@ -82,10 +82,10 @@ public static class TerrainHelper
     /// <param name="pos">The position of the chunk you want to remove.</param>
     internal static void RemoveChunk(Terrain terrain, Vector3Int pos)
     {
-        if (!terrain.terrainData.chunkDictionary.TryGetValue(pos, out var chunk)) return;
+        if (!terrain.terrainData.chunkRendererDictionary.TryGetValue(pos, out var chunk)) return;
 
         terrain.terrainRenderer.DeleteChunk(chunk);
-        terrain.terrainData.chunkDictionary.Remove(pos);
+        terrain.terrainData.chunkRendererDictionary.Remove(pos);
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public static class TerrainHelper
         {
             for (int z = startZ; z <= endZ; z += terrain.chunkSize)
             {
-                Vector3Int chunkPos = GetChunkPositionFromVoxelCoordinates(terrain, new Vector3Int(x, 0, z));
+                Vector3Int chunkPos = GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, 0, z));
                 chunkDataPositionsToCreate.Add(chunkPos);
                 if (x < playerPosition.x - terrain.chunkSize
                     || x > playerPosition.x + terrain.chunkSize
@@ -117,7 +117,7 @@ public static class TerrainHelper
 
                 for (int y = -terrain.chunkHeight; y >= playerPosition.y - terrain.chunkHeight * 2; y -= terrain.chunkHeight)
                 {
-                    chunkPos = GetChunkPositionFromVoxelCoordinates(terrain, new Vector3Int(x, y, z));
+                    chunkPos = GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, y, z));
                     chunkDataPositionsToCreate.Add(chunkPos);
                 }
             }
@@ -137,8 +137,8 @@ public static class TerrainHelper
     /// </returns>
     internal static ChunkRenderer GetChunk(Terrain terrainReference, Vector3Int terrainPosition)
     {
-        return terrainReference.terrainData.chunkDictionary.ContainsKey(terrainPosition)
-            ? terrainReference.terrainData.chunkDictionary[terrainPosition]
+        return terrainReference.terrainData.chunkRendererDictionary.ContainsKey(terrainPosition)
+            ? terrainReference.terrainData.chunkRendererDictionary[terrainPosition]
             : null;
     }
 
@@ -263,28 +263,28 @@ public static class TerrainHelper
 
     public static Chunk GetChunkData(Terrain terrainReference, Vector3Int terrainVoxelPosition)
     {
-        Vector3Int chunkPosition = GetChunkPositionFromVoxelCoordinates(terrainReference, terrainVoxelPosition);
+        Vector3Int chunkPosition = GetChunkPositionFromCoordinates(terrainReference, terrainVoxelPosition);
 
-        terrainReference.terrainData.chunkDataDictionary.TryGetValue(chunkPosition, out var containerChunk);
+        terrainReference.terrainData.chunkDictionary.TryGetValue(chunkPosition, out var containerChunk);
 
         return containerChunk;
     }
 
     internal static List<Vector3Int> GetUnnecessaryData(TerrainData terrainData, List<Vector3Int> allChunkDataPositionsNeeded)
     {
-        return terrainData.chunkDataDictionary.Keys
+        return terrainData.chunkDictionary.Keys
             .Where(pos => allChunkDataPositionsNeeded.Contains(pos) == false &&
-                          terrainData.chunkDataDictionary[pos].isPlayerModified == false)
+                          terrainData.chunkDictionary[pos].isPlayerModified == false)
             .ToList();
     }
 
     internal static List<Vector3Int> GetUnnecessaryChunks(TerrainData terrainData, List<Vector3Int> allChunkPositionsNeeded)
     {
         List<Vector3Int> positionToRemove = new List<Vector3Int>();
-        foreach (var pos in terrainData.chunkDictionary.Keys
+        foreach (var pos in terrainData.chunkRendererDictionary.Keys
                      .Where(pos => allChunkPositionsNeeded.Contains(pos) == false))
         {
-            if (terrainData.chunkDictionary.ContainsKey(pos))
+            if (terrainData.chunkRendererDictionary.ContainsKey(pos))
             {
                 positionToRemove.Add(pos);
             }
@@ -297,7 +297,7 @@ public static class TerrainHelper
         List<Vector3Int> allChunkPositionsNeeded, Vector3Int playerPosition)
     {
         return allChunkPositionsNeeded
-            .Where(pos => terrainData.chunkDictionary.ContainsKey(pos) == false)
+            .Where(pos => terrainData.chunkRendererDictionary.ContainsKey(pos) == false)
             .OrderBy(pos => Vector3.Distance(playerPosition, pos))
             .ToList();
     }
@@ -306,7 +306,7 @@ public static class TerrainHelper
         List<Vector3Int> allChunkDataPositionsNeeded, Vector3Int playerPosition)
     {
         return allChunkDataPositionsNeeded
-            .Where(pos => terrainData.chunkDataDictionary.ContainsKey(pos) == false)
+            .Where(pos => terrainData.chunkDictionary.ContainsKey(pos) == false)
             .OrderBy(pos => Vector3.Distance(playerPosition, pos))
             .ToList();
     }

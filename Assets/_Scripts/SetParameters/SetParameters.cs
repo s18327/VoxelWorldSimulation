@@ -8,9 +8,9 @@ using UnityEngine.Serialization;
 
 public class SetParameters : MonoBehaviour
 {
-    [FormerlySerializedAs("worldParameters")] public GameObject terrainParameters;
+    public GameObject terrainParameters;
     public Terrain terrainManager;
-    [FormerlySerializedAs("inputterrainFields")] [FormerlySerializedAs("inputWorldFields")] public List<GameObject> inputTerrainFields;
+    public List<GameObject> inputTerrainFields;
 
 
     void Start()

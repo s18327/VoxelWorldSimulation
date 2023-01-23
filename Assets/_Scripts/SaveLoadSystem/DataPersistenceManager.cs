@@ -114,7 +114,7 @@ public class DataPersistenceManager : MonoBehaviour
     {
         Terrain terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
         terrainData = terrain.terrainData;
-        terrainData.jsonChunkDataDictionary = JsonConvert.SerializeObject(terrainData.chunkDataDictionary, Formatting.None);
+        terrainData.jsonChunkDataDictionary = JsonConvert.SerializeObject(terrainData.chunkDictionary, Formatting.None);
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         Vector3 playerPos = player.transform.position;

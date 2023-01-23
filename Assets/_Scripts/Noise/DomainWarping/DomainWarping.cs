@@ -20,8 +20,8 @@ public class DomainWarping : MonoBehaviour
 /// </returns>
     public float GenerateDomainNoise(int x, int z, NoiseSettings defaultNoiseSettings)
     {
-        Vector2 domainOffset = GenerateDomainOffset(x, z);
-        return MyOctavePerlin.OctavePerlin(x + domainOffset.x, z + domainOffset.y, defaultNoiseSettings);
+        var domainOffset = GenerateDomainOffset(x, z);
+        return Noise.GetNoise(x + domainOffset.x, z + domainOffset.y, defaultNoiseSettings);
     }
 
 /// <summary>
@@ -35,8 +35,8 @@ public class DomainWarping : MonoBehaviour
 /// </returns>
     public Vector2 GenerateDomainOffset(int x, int z)
     {
-        var noiseX = MyOctavePerlin.OctavePerlin(x, z, noiseDomainX) * amplitudeX;
-        var noiseY = MyOctavePerlin.OctavePerlin(x, z, noiseDomainY) * amplitudeY;
+        var noiseX = Noise.GetNoise(x, z, noiseDomainX) * amplitudeX;
+        var noiseY = Noise.GetNoise(x, z, noiseDomainY) * amplitudeY;
         return new Vector2(noiseX, noiseY);
     }
 /// <summary>

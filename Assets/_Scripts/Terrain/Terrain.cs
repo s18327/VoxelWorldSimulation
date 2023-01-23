@@ -39,8 +39,8 @@ public class Terrain : MonoBehaviour
         {
             terrainData = new TerrainData
             {
-                chunkDataDictionary = new Dictionary<Vector3Int, Chunk>(),
-                chunkDictionary = new Dictionary<Vector3Int, ChunkRenderer>()
+                chunkDictionary = new Dictionary<Vector3Int, Chunk>(),
+                chunkRendererDictionary = new Dictionary<Vector3Int, ChunkRenderer>()
             };
 
             await GenerateTerrain(Vector3Int.zero);
@@ -50,15 +50,15 @@ public class Terrain : MonoBehaviour
             var loadedChunkDataDictionary = persistenceManager.loadedChunkDataDictionary;
             terrainData = new TerrainData
             {
-                chunkDataDictionary = loadedChunkDataDictionary,
-                chunkDictionary = new Dictionary<Vector3Int, ChunkRenderer>()
+                chunkDictionary = loadedChunkDataDictionary,
+                chunkRendererDictionary = new Dictionary<Vector3Int, ChunkRenderer>()
             };
             
             chunkSize = persistenceManager.terrainParameters.chunkSize;
             chunkHeight = persistenceManager.terrainParameters.chunkHeight;
             chunkDrawingRange = persistenceManager.terrainParameters.chunkDrawRange;
             mapSeedOffset = persistenceManager.terrainParameters.mapSeedOffset;
-            ;
+            
             var persistedPlayerPosition = new Vector3Int(
                 Mathf.FloorToInt(persistenceManager.playerData.playerPosition.x),
                 Mathf.FloorToInt(persistenceManager.playerData.playerPosition.y),
@@ -104,10 +104,10 @@ public class Terrain : MonoBehaviour
 
         foreach (var calculatedData in dataDictionary)
         {
-            terrainData.chunkDataDictionary.Add(calculatedData.Key, calculatedData.Value);
+            terrainData.chunkDictionary.Add(calculatedData.Key, calculatedData.Value);
         }
 
-        foreach (var chunkData in terrainData.chunkDataDictionary.Values)
+        foreach (var chunkData in terrainData.chunkDictionary.Values)
         {
             AddTreeLeaves(chunkData);
         }
@@ -116,7 +116,7 @@ public class Terrain : MonoBehaviour
 
         bool Predicate(KeyValuePair<Vector3Int, Chunk> keyValuePair) => terrainGenerationData.chunkPositionsToCreate.Contains(keyValuePair.Key);
 
-        List<Chunk> dataToRender = terrainData.chunkDataDictionary
+        List<Chunk> dataToRender = terrainData.chunkDictionary
             .Where(Predicate)
             .Select(keyValuePair => keyValuePair.Value)
             .ToList();
@@ -208,7 +208,7 @@ public class Terrain : MonoBehaviour
     private void CreateChunk(TerrainData terrainData, Vector3Int position, Mesh mesh)
     {
         var chunkRenderer = terrainRenderer.RenderChunk(terrainData, position, mesh);
-        terrainData.chunkDictionary.Add(position, chunkRenderer);
+        terrainData.chunkRendererDictionary.Add(position, chunkRenderer);
     }
 
 
@@ -313,7 +313,7 @@ public class Terrain : MonoBehaviour
     {
         var chunkPositionFromVoxelCoordinates = ChunkHelper.ChunkPositionFromVoxelCoordinates(this, x, y, z);
 
-        terrainData.chunkDataDictionary.TryGetValue(chunkPositionFromVoxelCoordinates, out var containerChunk);
+        terrainData.chunkDictionary.TryGetValue(chunkPositionFromVoxelCoordinates, out var containerChunk);
 
         if (containerChunk == null) return VoxelType.Nothing;
         

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /* It's a class that contains a bunch of static functions that are used to generate noise */
-public static class MyOctavePerlin
+public static class Noise
 {
     
 /// <summary>
@@ -14,12 +14,11 @@ public static class MyOctavePerlin
 /// <param name="outputMin">The minimum value of the output range.</param>
 /// <param name="outputMax">The maximum value of the output range.</param>
 /// <returns>
-/// The value of the outputMin + (value - 0) * (outputMax - outputMin) / (1 - 0)
+/// The value of the outputMin + value  * (outputMax - outputMin)
 /// </returns>
     public static float RemapValue(float value, float outputMin, float outputMax)
     {
-       // return outputMin + (value - 0) * (outputMax - outputMin) / (1 - 0);
-       return outputMin + value  * (outputMax - outputMin);
+        return outputMin + value  * (outputMax - outputMin);
     }
 
     public static int RemapValueToInt(float value, float outputMin, float outputMax)
@@ -41,28 +40,16 @@ public static class MyOctavePerlin
         return Mathf.Pow(noise * settings.redistributionModifier, settings.exponent);
     }
 
-    public static float OctavePerlin(float x, float z, NoiseSettings settings)
+    public static float GetNoise(float x, float z, NoiseSettings settings)
     {
         x *= settings.noiseZoom;
         z *= settings.noiseZoom;
         x += settings.noiseZoom;
         z += settings.noiseZoom;
 
-        float noise = 0;
-        float frequency = 1;
-        float amplitude = 1;
-        float amplitudeSum = 0;
-        for (var i = 0; i < settings.octaves; i++)
-        {
-            noise += Mathf.PerlinNoise((settings.offset.x + settings.terrainOffset.x + x) * frequency, 
-                                        (settings.offset.y + settings.terrainOffset.y + z) * frequency) * amplitude;
-
-            amplitudeSum += amplitude;
-
-            amplitude *= settings.persistence;
-            frequency *= 2;
-        }
-
-        return noise / amplitudeSum;
+        var noise = Mathf.PerlinNoise((settings.offset.x + settings.terrainOffset.x + x), 
+                                        (settings.offset.y + settings.terrainOffset.y + z));
+        
+        return noise;
     }
 }
