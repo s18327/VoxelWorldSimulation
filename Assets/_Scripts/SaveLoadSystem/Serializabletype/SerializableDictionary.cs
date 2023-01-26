@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,8 +6,8 @@ using UnityEngine;
 public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
 
-    [SerializeField] private List<TKey> keys = new List<TKey>();
-    [SerializeField] private List<TValue> values = new List<TValue>();
+    [SerializeField] private List<TKey> keys = new ();
+    [SerializeField] private List<TValue> values = new ();
 
 /// <summary>
 /// It clears the keys and values lists, then adds the keys and values from the dictionary to the lists.

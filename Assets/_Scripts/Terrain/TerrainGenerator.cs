@@ -7,8 +7,8 @@ public class TerrainGenerator : MonoBehaviour
 {
     public BiomeGenerator biomeGenerator;
 
-    [SerializeField] List<Vector3Int> biomeCenters = new ();
-    List<float> biomeNoise = new ();
+    [SerializeField] List<Vector3Int> biomeCenters = new();
+    List<float> biomeNoise = new();
 
     [SerializeField] private NoiseSettings biomeNoiseSettings;
 
@@ -19,14 +19,15 @@ public class TerrainGenerator : MonoBehaviour
 
     public Chunk GenerateChunkData(Chunk data, Vector2Int mapSeedOffset)
     {
-        BiomeGeneratorSelection biomeSelection = SelectBiomeGenerator(data.terrainPosition, data, false);
+        var biomeSelection = SelectBiomeGenerator(data.terrainPosition, data, false);
         data.treeData = biomeSelection.biomeGenerator.GetTreeData(data, mapSeedOffset);
-        for (int x = 0; x < data.chunkSize; x++)
+        for (var x = 0; x < data.chunkSize; x++)
         {
-            for (int z = 0; z < data.chunkSize; z++)
+            for (var z = 0; z < data.chunkSize; z++)
             {
                 biomeSelection =
-                    SelectBiomeGenerator(new Vector3Int(data.terrainPosition.x + x, 0, data.terrainPosition.z + z), data);
+                    SelectBiomeGenerator(new Vector3Int(data.terrainPosition.x + x, 0, data.terrainPosition.z + z),
+                        data);
                 data = biomeSelection.biomeGenerator.ProcessChunkColumn(data, x, z, mapSeedOffset,
                     biomeSelection.terrainSurfaceNoise);
             }
@@ -45,25 +46,25 @@ public class TerrainGenerator : MonoBehaviour
             terrainPosition += new Vector3Int(domainOffset.x, 0, domainOffset.y);
         }
 
-        List<BiomeSelectionHelper> biomeSelectionHelpers = GetBiomeGeneratorSelectionHelpers(terrainPosition);
-        BiomeGenerator generator1 = SelectBiome(biomeSelectionHelpers[0].Index);
-        BiomeGenerator generator2 = SelectBiome(biomeSelectionHelpers[1].Index);
+        var biomeSelectionHelpers = GetBiomeGeneratorSelectionHelpers(terrainPosition);
+        var generator1 = SelectBiome(biomeSelectionHelpers[0].Index);
+        var generator2 = SelectBiome(biomeSelectionHelpers[1].Index);
 
-        float distance =
+        var distance =
             Vector3.Distance(
                 biomeCenters[biomeSelectionHelpers[0].Index],
                 biomeCenters[biomeSelectionHelpers[1].Index]);
-        float weight0 = biomeSelectionHelpers[0].Distance / distance;
-        float weight1 = 1 - weight0;
-        int terrainHeightNoise0 = generator1.GetSurfaceHeight(terrainPosition.x, terrainPosition.z, data.chunkHeight);
-        int terrainHeightNoise1 = generator2.GetSurfaceHeight(terrainPosition.x, terrainPosition.z, data.chunkHeight);
+        var weight0 = biomeSelectionHelpers[0].Distance / distance;
+        var weight1 = 1 - weight0;
+        var terrainHeightNoise0 = generator1.GetSurfaceHeight(terrainPosition.x, terrainPosition.z, data.chunkHeight);
+        var terrainHeightNoise1 = generator2.GetSurfaceHeight(terrainPosition.x, terrainPosition.z, data.chunkHeight);
         return new BiomeGeneratorSelection(generator1,
             Mathf.RoundToInt(terrainHeightNoise0 * weight0 + terrainHeightNoise1 * weight1));
     }
 
     private BiomeGenerator SelectBiome(int index)
     {
-        float temp = biomeNoise[index];
+        var temp = biomeNoise[index];
         foreach (var data in biomeGeneratorsData)
         {
             if (temp >= data.temperatureStartThreshold && temp < data.temperatureEndThreshold)
@@ -81,7 +82,8 @@ public class TerrainGenerator : MonoBehaviour
 
     private List<BiomeSelectionHelper> GetClosestBiomeIndex(Vector3Int position)
     {
-        BiomeSelectionHelper Selector(Vector3Int center, int index) => new () { Index = index, Distance = Vector3.Distance(center, position) };
+        BiomeSelectionHelper Selector(Vector3Int center, int index) =>
+            new() { Index = index, Distance = Vector3.Distance(center, position) };
 
         return biomeCenters.Select(Selector).OrderBy(helper => helper.Distance).Take(4).ToList();
     }
@@ -97,9 +99,9 @@ public class TerrainGenerator : MonoBehaviour
         biomeCenters = new List<Vector3Int>();
         biomeCenters = BiomeGenerator.CalculateBiomeCenters(playerPosition, drawRange, chunkSize);
 
-        for (int i = 0; i < biomeCenters.Count; i++)
+        for (var i = 0; i < biomeCenters.Count; i++)
         {
-            Vector2Int domainWarpingOffset
+            var domainWarpingOffset
                 = biomeDomainWarping.GenerateDomainOffsetInt(biomeCenters[i].x, biomeCenters[i].y);
             biomeCenters[i] += new Vector3Int(domainWarpingOffset.x, 0, domainWarpingOffset.y);
         }
@@ -138,7 +140,7 @@ public class BiomeGeneratorSelection
 
     public BiomeGeneratorSelection(BiomeGenerator biomeGeneror, int? terrainSurfaceNoise = null)
     {
-        this.biomeGenerator = biomeGeneror;
+        biomeGenerator = biomeGeneror;
         this.terrainSurfaceNoise = terrainSurfaceNoise;
     }
 }

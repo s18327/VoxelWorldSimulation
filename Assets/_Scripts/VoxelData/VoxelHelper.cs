@@ -39,14 +39,14 @@ public static class VoxelHelper
         if (voxelType is VoxelType.Air or VoxelType.Nothing)
             return mesh;
 
-        foreach (Direction direction in Directions)
+        foreach (var direction in Directions)
         {
             var adjacentVoxelLocation = new Vector3Int(x, y, z) + direction.GetVector();
             var adjacentVoxelType = ChunkHelper.GetVoxelFromChunkCoordinates(chunk, adjacentVoxelLocation);
 
             if (adjacentVoxelType is VoxelType.Nothing ||
                 VoxelDataManager.voxelDataDictionary[adjacentVoxelType].isSolid)
-                continue; //TODO: Check if this should be reversed
+                continue; 
             if (voxelType is VoxelType.Water)
             {
                 if (adjacentVoxelType is VoxelType.Air)

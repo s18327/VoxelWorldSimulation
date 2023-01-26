@@ -8,7 +8,7 @@ public class TerrainRenderer : MonoBehaviour
 {
     public GameObject chunkPrefab;
     public GameObject chunkStorage;
-    public Queue<ChunkRenderer> chunkQueue = new();
+    private Queue<ChunkRenderer> chunkQueue = new();
 
     /// <summary>
     /// If there's a chunk in the pool, use it, otherwise create a new one
@@ -29,7 +29,7 @@ public class TerrainRenderer : MonoBehaviour
         }
         else
         {
-            GameObject objectInstance = Instantiate(chunkPrefab, position, Quaternion.identity, chunkStorage.transform);
+            var objectInstance = Instantiate(chunkPrefab, position, Quaternion.identity, chunkStorage.transform);
             objectInstance.layer = 6;
             chunk = objectInstance.GetComponent<ChunkRenderer>();
         }

@@ -7,8 +7,7 @@ public static class Noise
 {
     
 /// <summary>
-/// > RemapValue01(value, outputMin, outputMax) = outputMin + (value - 0) * (outputMax - outputMin) / (1
-/// - 0)
+/// > RemapValue01(value, outputMin, outputMax) = outputMin + (value - 0) * (outputMax - outputMin) / 1
 /// </summary>
 /// <param name="value">The value to remap.</param>
 /// <param name="outputMin">The minimum value of the output range.</param>

@@ -17,16 +17,16 @@ public class TreeSwitch : MonoBehaviour
 /// <summary>
 /// It's a function that disables the tree generation for all the biomes in the scene on start.
 /// </summary>
-    void Start()
+private void Start()
     {
-        for (int i = 0; i < terrainGenerator.transform.childCount; i++)
+        for (var i = 0; i < terrainGenerator.transform.childCount; i++)
         {
             biomeGenerators.Add(terrainGenerator.transform.GetChild(i).gameObject);
         }
 
-        for (int i = 0; i < biomeGenerators.Count; i++)
+        foreach (var biomeGenerator in biomeGenerators)
         {
-            biomeGenerators[i].GetComponent<TreeGenerator>().treeNoiseSettings = treeDisable;
+            biomeGenerator.GetComponent<TreeGenerator>().treeNoiseSettings = treeDisable;
         }
         SetClicked();
     }

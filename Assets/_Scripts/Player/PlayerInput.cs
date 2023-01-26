@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /* It's a class that gets input from the player and then sends it to the other classes that need it */
@@ -17,7 +15,7 @@ public class PlayerInput : MonoBehaviour
 /// <summary>
 /// This function is called every frame and updates the values of the input variables
 /// </summary>
-    void Update()
+private void Update()
     {
         GetLeftMouseClick();
         GetRightMouseClick();

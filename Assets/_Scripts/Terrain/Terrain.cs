@@ -16,17 +16,17 @@ public class Terrain : MonoBehaviour
 
     public bool newGame;
     private bool IsTerrainCreated { get; set; }
-    
+
     public TerrainRenderer terrainRenderer;
     public TerrainData terrainData;
     public TerrainGenerator terrainGenerator;
 
-    private CancellationTokenSource taskSource = new ();
+    private CancellationTokenSource taskSource = new();
     public UnityEvent OnTerrainCreated;
     public UnityEvent OnNewChunksGenerated;
 
-    private Dictionary<Vector3Int, int> durability = new ();
-    
+    private Dictionary<Vector3Int, int> durability = new();
+
     public void IsNewGame()
     {
         newGame = true;
@@ -53,12 +53,12 @@ public class Terrain : MonoBehaviour
                 chunkDictionary = loadedChunkDataDictionary,
                 chunkRendererDictionary = new Dictionary<Vector3Int, ChunkRenderer>()
             };
-            
+
             chunkSize = persistenceManager.terrainParameters.chunkSize;
             chunkHeight = persistenceManager.terrainParameters.chunkHeight;
             chunkDrawingRange = persistenceManager.terrainParameters.chunkDrawRange;
             mapSeedOffset = persistenceManager.terrainParameters.mapSeedOffset;
-            
+
             var persistedPlayerPosition = new Vector3Int(
                 Mathf.FloorToInt(persistenceManager.playerData.playerPosition.x),
                 Mathf.FloorToInt(persistenceManager.playerData.playerPosition.y),
@@ -114,9 +114,10 @@ public class Terrain : MonoBehaviour
 
         ConcurrentDictionary<Vector3Int, Mesh> meshDataDictionary;
 
-        bool Predicate(KeyValuePair<Vector3Int, Chunk> keyValuePair) => terrainGenerationData.chunkPositionsToCreate.Contains(keyValuePair.Key);
+        bool Predicate(KeyValuePair<Vector3Int, Chunk> keyValuePair) =>
+            terrainGenerationData.chunkPositionsToCreate.Contains(keyValuePair.Key);
 
-        List<Chunk> dataToRender = terrainData.chunkDictionary
+        var dataToRender = terrainData.chunkDictionary
             .Where(Predicate)
             .Select(keyValuePair => keyValuePair.Value)
             .ToList();
@@ -215,29 +216,28 @@ public class Terrain : MonoBehaviour
     internal void SetVoxel(RaycastHit hit, VoxelType voxelType) //TODO:Check this and the Place Voxel Below 
     {
         var chunkRenderer = hit.collider.GetComponent<ChunkRenderer>();
-        
+
         if (chunkRenderer == null) return;
 
-        Vector3Int pos = GetVoxelPositionFromRaycast(hit);
+        var voxelPosition = GetVoxelPositionFromRaycast(hit);
 
-        TerrainHelper.SetNewVoxel(chunkRenderer.chunk.terrainReference, pos, voxelType, durability, false);
+        TerrainHelper.SetNewVoxel(chunkRenderer.chunk.terrainReference, voxelPosition, voxelType, durability, false);
 
         chunkRenderer.IsPlayerModified = true;
 
-        if (ChunkHelper.IsOnEdge(chunkRenderer.chunk, pos))
+        if (ChunkHelper.IsOnChunkEdge(chunkRenderer.chunk, voxelPosition))
         {
-            var neighbourDataList = ChunkHelper.GetEdgeNeighbourChunk(chunkRenderer.chunk, pos);
-            foreach (var chunkToUpdate in neighbourDataList.
-                         Select(neighbourData => TerrainHelper.
-                         GetChunk(neighbourData.terrainReference, neighbourData.terrainPosition)).
-                         Where(chunkToUpdate => chunkToUpdate != null))
+            var neighbourDataList = ChunkHelper.GetEdgeNeighbourChunk(chunkRenderer.chunk, voxelPosition);
+            foreach (var chunkToUpdate in neighbourDataList
+                         .Select(neighbourData =>
+                             TerrainHelper.GetChunk(neighbourData.terrainReference, neighbourData.terrainPosition))
+                         .Where(chunkToUpdate => chunkToUpdate != null))
             {
                 chunkToUpdate.UpdateChunk();
             }
         }
 
         chunkRenderer.UpdateChunk();
-       
     }
 
     internal void PlaceVoxel(RaycastHit hit, VoxelType voxelType)
@@ -258,8 +258,9 @@ public class Terrain : MonoBehaviour
 
         chunkRenderer.UpdateChunk();
     }
-    
-    private static Vector3Int PlaceVoxelInPosition(Vector3Int hitPosition, RaycastHit hit) //TODO: check if position is in chunk.
+
+    private static Vector3Int
+        PlaceVoxelInPosition(Vector3Int hitPosition, RaycastHit hit) //TODO: check if position is in chunk.
     {
         var position = new Vector3(
             hitPosition.x + hit.normal.x,
@@ -268,7 +269,7 @@ public class Terrain : MonoBehaviour
         );
         return Vector3Int.RoundToInt(position);
     }
-    
+
     private static Vector3Int GetVoxelPositionFromRaycast(RaycastHit hit)
     {
         Vector3 position = new Vector3(
@@ -279,7 +280,7 @@ public class Terrain : MonoBehaviour
 
         return Vector3Int.RoundToInt(position);
     }
-    
+
     private static float CalculateNormalisedVoxelPosition(float position, float normal)
     {
         const double tolerance = 0.0000000001;
@@ -297,16 +298,17 @@ public class Terrain : MonoBehaviour
 
         var requiredChunkDataPositions =
             TerrainHelper.GetDataPositionsAroundPlayer(this, playerPosition);
-        
+
         return new TerrainGenerationData
         {
-            chunkPositionsToCreate = TerrainHelper.SelectPositionsToCreate(terrainData, requiredChunkPositions, playerPosition),
-            chunkDataPositionsToCreate =  TerrainHelper.SelectDataPositionsToCreate(terrainData, requiredChunkDataPositions, playerPosition),
+            chunkPositionsToCreate =
+                TerrainHelper.SelectPositionsToCreate(terrainData, requiredChunkPositions, playerPosition),
+            chunkDataPositionsToCreate =
+                TerrainHelper.SelectDataPositionsToCreate(terrainData, requiredChunkDataPositions, playerPosition),
             chunkPositionsToRemove = TerrainHelper.GetUnnecessaryChunks(terrainData, requiredChunkPositions),
             chunkDataToRemove = TerrainHelper.GetUnnecessaryData(terrainData, requiredChunkDataPositions),
         };
     }
-
 
 
     internal VoxelType GetVoxelFromCoordinates(int x, int y, int z)
@@ -316,20 +318,20 @@ public class Terrain : MonoBehaviour
         terrainData.chunkDictionary.TryGetValue(chunkPositionFromVoxelCoordinates, out var containerChunk);
 
         if (containerChunk == null) return VoxelType.Nothing;
-        
+
         var voxelPosInChunkCoordinates =
-                ChunkHelper.GetVoxelPosInChunkCoordinates(containerChunk, new Vector3Int(x, y, z));
-        
+            ChunkHelper.GetVoxelPosInChunkCoordinates(containerChunk, new Vector3Int(x, y, z));
+
         return ChunkHelper.GetVoxelFromChunkCoordinates(containerChunk, voxelPosInChunkCoordinates);
     }
-    
+
     internal async void RequestAdditionalChunkLoad(GameObject player)
     {
         Debug.Log("Load more chunks");
         await GenerateTerrain(Vector3Int.RoundToInt(player.transform.position));
         OnNewChunksGenerated?.Invoke();
     }
-    
+
     public void OnDisable()
     {
         taskSource.Cancel();

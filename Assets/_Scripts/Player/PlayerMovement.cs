@@ -86,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
     public void Walk(Vector3 movementInput, bool runningInput)
     {
         Vector3 movementDirection = GetMovementDirection(movementInput);
-        float speed = runningInput ? playerRunSpeed : playerSpeed;
+        var speed = runningInput ? playerRunSpeed : playerSpeed;
         controller.Move(movementDirection * (Time.deltaTime * speed));
     }
 

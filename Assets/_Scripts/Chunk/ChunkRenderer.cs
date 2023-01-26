@@ -13,9 +13,9 @@ using UnityEngine.Serialization;
 public class ChunkRenderer : MonoBehaviour
 {
     
-    MeshFilter meshFilter;
-    MeshCollider meshCollider;
-    UnityEngine.Mesh mesh;
+    private MeshFilter meshFilter;
+    private MeshCollider meshCollider;
+    private UnityEngine.Mesh mesh;
     
 
     public Chunk chunk;
@@ -66,15 +66,18 @@ public class ChunkRenderer : MonoBehaviour
         this.mesh.vertices = mesh.vertexList.Concat(mesh.waterSubMesh.vertexList).ToArray();
 
         this.mesh.SetTriangles(mesh.triangleList.ToArray(), 0);
-        this.mesh.SetTriangles(mesh.waterSubMesh.triangleList.Select(val => val + mesh.vertexList.Count).ToArray(), 1);
+
+        int Selector(int val) => val + mesh.vertexList.Count;
+        this.mesh.SetTriangles(mesh.waterSubMesh.triangleList.Select(Selector).ToArray(), 1);
 
         this.mesh.uv = mesh.uvList.Concat(mesh.waterSubMesh.uvList).ToArray();
         this.mesh.RecalculateNormals();
-
-        meshCollider.sharedMesh = null;
-        UnityEngine.Mesh collisionMesh = new UnityEngine.Mesh();
-        collisionMesh.vertices = mesh.colliderVertexList.ToArray();
-        collisionMesh.triangles = mesh.colliderTriangleList.ToArray();
+        
+        var collisionMesh = new UnityEngine.Mesh
+        {
+            vertices = mesh.colliderVertexList.ToArray(),
+            triangles = mesh.colliderTriangleList.ToArray()
+        };
         collisionMesh.RecalculateNormals();
 
         meshCollider.sharedMesh = collisionMesh;

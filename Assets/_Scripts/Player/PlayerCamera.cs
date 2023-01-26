@@ -13,7 +13,7 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField]
     private PlayerInput playerInput;
 
-    float verticalRotation = 0f;
+    private float verticalRotation;
 
 
 /// <summary>
@@ -43,8 +43,8 @@ public class PlayerCamera : MonoBehaviour
 {
     if (GameObject.Find("Game Manager").GetComponent<GameManager>().keyClicked) return;
     
-    float mouseX = playerInput.MousePosition.x * sensitivity * Time.deltaTime;
-    float mouseY = playerInput.MousePosition.y * sensitivity * Time.deltaTime;
+    var mouseX = playerInput.MousePosition.x * sensitivity * Time.deltaTime;
+    var mouseY = playerInput.MousePosition.y * sensitivity * Time.deltaTime;
 
     verticalRotation -= mouseY;
     verticalRotation = Mathf.Clamp(verticalRotation, -90, 90);

@@ -249,11 +249,12 @@ public static class ChunkHelper
 /// <returns>
 /// A boolean value.
 /// </returns>
-    internal static bool IsOnEdge(Chunk chunk, Vector3Int terrainPosition)
+    internal static bool IsOnChunkEdge(Chunk chunk, Vector3Int terrainPosition)
     {
         var chunkPosition = GetVoxelPosInChunkCoordinates(chunk, terrainPosition);
         return chunkPosition.x == 0 || chunkPosition.x == chunk.chunkSize - 1 ||
                chunkPosition.y == 0 || chunkPosition.y == chunk.chunkHeight - 1 ||
                chunkPosition.z == 0 || chunkPosition.z == chunk.chunkSize - 1;
     }
+
 }

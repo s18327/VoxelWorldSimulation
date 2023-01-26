@@ -58,7 +58,7 @@ public class Character : MonoBehaviour
         fly = !fly;
     }
 
-    void Update()
+private void Update()
     {
        /* It's getting the current voxel that the player has selected. */
         currentVoxel = VoxelDataManager.selectableVoxelList.ElementAt(playerInput.VoxelTypeNumberSelected).Key.ToString();
@@ -81,7 +81,8 @@ public class Character : MonoBehaviour
             playerMovement.Walk(playerInput.MovementInput, playerInput.RunningPressed);
         }
     }
-    IEnumerator ResetWaiting()
+
+    private IEnumerator ResetWaiting()
     {
         yield return new WaitForSeconds(0.1f);
         isWaiting = false;
@@ -108,7 +109,7 @@ public class Character : MonoBehaviour
 /// </summary>
     private void HandleRightMouseClick()
     {
-        Ray playerRay = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
+        var playerRay = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         if (!Physics.Raycast(playerRay, out var hit, interactionRayLength, groundMask)) return;
         PlaceVoxel(hit);
     }

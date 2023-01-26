@@ -68,17 +68,17 @@ public class TreeLayerHandler : LayerHandler
             || !chunk.treeData.treePositions.Contains(new Vector2Int(chunk.terrainPosition.x + x,
                 chunk.terrainPosition.z + z))) return false;
         
-        Vector3Int chunkCoordinates = new Vector3Int(x, surfaceHeightNoise, z);
-        VoxelType type = ChunkHelper.GetVoxelFromChunkCoordinates(chunk, chunkCoordinates);
+        var chunkCoordinates = new Vector3Int(x, surfaceHeightNoise, z);
+        var type = ChunkHelper.GetVoxelFromChunkCoordinates(chunk, chunkCoordinates);
         if (type != VoxelType.Grass) return false;
         
         ChunkHelper.SetVoxel(chunk, chunkCoordinates, VoxelType.Dirt);
-        for (int i = 1; i < 5; i++)
+        for (var i = 1; i < 5; i++)
         {
             chunkCoordinates.y = surfaceHeightNoise + i;
             ChunkHelper.SetVoxel(chunk, chunkCoordinates, VoxelType.TreeTrunk);
         }
-        foreach (Vector3Int leafPosition in treeLeavesStaticLayout)
+        foreach (var leafPosition in treeLeavesStaticLayout)
         {
             chunk.treeData.treeLeaves.Add(new Vector3Int(x + leafPosition.x, surfaceHeightNoise + 5 + leafPosition.y, z + leafPosition.z));
         }

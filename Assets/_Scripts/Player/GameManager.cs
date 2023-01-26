@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     public VoxelSo voxel;
 
-    PlayerData playerData;
+    private PlayerData playerData;
 
     public Vector3 spawnPos;
     public Vector3 playerPositions;
@@ -49,7 +49,7 @@ void Update()
 
     public void Following()
     {
-        PlayerData playerData = GameObject.Find("SaveLoadSystem").GetComponent<DataPersistenceManager>().playerData;
+        var playerData = GameObject.Find("SaveLoadSystem").GetComponent<DataPersistenceManager>().playerData;
         if (loadGame)
         {
             gameManager.transform.position = playerData.playerPosition;
@@ -57,8 +57,8 @@ void Update()
         }
         else if (newGame)
         {
-            this.gameObject.transform.position = new Vector3Int(terrain.chunkSize / 2, 100, terrain.chunkSize / 2);
-           // newGame = false;
+            gameObject.transform.position = new Vector3Int(terrain.chunkSize / 2, 100, terrain.chunkSize / 2);
+
         }
         else if (player != null)
         {
@@ -86,7 +86,7 @@ void Update()
         Cursor.lockState = CursorLockMode.Locked;
         if (player != null) return;
         
-        Vector3Int raycastStartPosition = new Vector3Int(Mathf.FloorToInt(gameManager.transform.position.x), 200, Mathf.FloorToInt(gameManager.transform.position.z));
+        var raycastStartPosition = new Vector3Int(Mathf.FloorToInt(gameManager.transform.position.x), 200, Mathf.FloorToInt(gameManager.transform.position.z));
         if (!Physics.Raycast(raycastStartPosition, Vector3.down, out var hit, 200)) return;
         
         playerData = GameObject.Find("SaveLoadSystem").GetComponent<DataPersistenceManager>().playerData;
@@ -99,7 +99,7 @@ void Update()
                 spawnPos = spawnPos,
                 playerPosition = spawnPos
             };
-            newGame = false;  //TODO: check if this doesn't break save system and try to clean up
+            newGame = false;  
         }
 
         if (playerData.spawnPos != playerData.playerPosition)
@@ -115,7 +115,7 @@ void Update()
 
         StartCheckingTheMap();
 
-        Toolbar toolbar = GameObject.FindWithTag("Toolbar").GetComponent<Toolbar>();
+        var toolbar = GameObject.FindWithTag("Toolbar").GetComponent<Toolbar>();
         toolbar.Create();
     }
     public void IsNewGame()

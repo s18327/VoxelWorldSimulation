@@ -24,14 +24,18 @@ public class Toolbar : MonoBehaviour
             highlight.position = itemSlots[playerInput.VoxelTypeNumberSelected].icon.transform.position;
         }
 
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll == 0) return;
-        
-        if (scroll > 0)
+        var scroll = Input.GetAxis("Mouse ScrollWheel");
+        switch (scroll)
         {
-            playerInput.VoxelTypeNumberSelected -= 1;
+            case 0:
+                return;
+            case > 0:
+                playerInput.VoxelTypeNumberSelected -= 1;
+                break;
+            default:
+                playerInput.VoxelTypeNumberSelected += 1;
+                break;
         }
-        else { playerInput.VoxelTypeNumberSelected += 1; }
 
         if (playerInput.VoxelTypeNumberSelected > itemSlots.Length - 1) playerInput.VoxelTypeNumberSelected = 0;
 

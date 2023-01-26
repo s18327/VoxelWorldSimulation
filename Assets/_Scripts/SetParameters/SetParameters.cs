@@ -13,7 +13,7 @@ public class SetParameters : MonoBehaviour
     public List<GameObject> inputTerrainFields;
 
 
-    void Start()
+    private void Start()
     {
         InitializeParameterFields();
         SetText();
@@ -31,7 +31,7 @@ public class SetParameters : MonoBehaviour
 
     private void InitializeParameterFields()
     {
-        for (int i = 0; i < terrainParameters.transform.childCount; i++)
+        for (var i = 0; i < terrainParameters.transform.childCount; i++)
         {
             if (terrainParameters.transform.GetChild(i).childCount > 2)
             {
@@ -50,7 +50,7 @@ public class SetParameters : MonoBehaviour
 
         if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[0].transform.parent.GetChild(1).gameObject)
         {
-            Text newParameter = inputTerrainFields[0].transform.GetChild(2).GetComponent<Text>();
+            var newParameter = inputTerrainFields[0].transform.GetChild(2).GetComponent<Text>();
             if (newParameter != null && newParameter.text.Length > 0)
                 terrainManager.chunkSize = int.Parse(newParameter.text);
             return;
@@ -65,15 +65,15 @@ public class SetParameters : MonoBehaviour
         }
         if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[2].transform.parent.GetChild(1).gameObject)
         {
-            Text newParameter = inputTerrainFields[2].transform.GetChild(2).GetComponent<Text>();
+            var newParameter = inputTerrainFields[2].transform.GetChild(2).GetComponent<Text>();
             if (newParameter != null && newParameter.text.Length > 0)
                 terrainManager.chunkDrawingRange = int.Parse(newParameter.text);
             return;
         }
         if (EventSystem.current.currentSelectedGameObject.gameObject == inputTerrainFields[3].transform.parent.GetChild(2).gameObject)
         {
-            Text xParameter = inputTerrainFields[3].transform.GetChild(2).GetComponent<Text>();
-            Text yParameter = inputTerrainFields[4].transform.GetChild(2).GetComponent<Text>();
+            var xParameter = inputTerrainFields[3].transform.GetChild(2).GetComponent<Text>();
+            var yParameter = inputTerrainFields[4].transform.GetChild(2).GetComponent<Text>();
             if (xParameter != null && yParameter != null && xParameter.text.Length > 0 && yParameter.text.Length > 0)
                 terrainManager.mapSeedOffset = new Vector2Int(int.Parse(xParameter.text), int.Parse(yParameter.text));
             return;

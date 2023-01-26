@@ -53,7 +53,9 @@ public static class TerrainHelper
                     || z < playerPosition.z - terrain.chunkSize
                     || z > playerPosition.z + terrain.chunkSize) continue;
 
-                for (int y = -terrain.chunkHeight; y >= playerPosition.y - terrain.chunkHeight * 2; y -= terrain.chunkHeight)
+                for (int y = -terrain.chunkHeight;
+                     y >= playerPosition.y - terrain.chunkHeight * 2;
+                     y -= terrain.chunkHeight)
                 {
                     chunkPositionFromVoxelCoordinates =
                         GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, y, z));
@@ -115,7 +117,9 @@ public static class TerrainHelper
                     || z < playerPosition.z - terrain.chunkSize
                     || z > playerPosition.z + terrain.chunkSize) continue;
 
-                for (int y = -terrain.chunkHeight; y >= playerPosition.y - terrain.chunkHeight * 2; y -= terrain.chunkHeight)
+                for (int y = -terrain.chunkHeight;
+                     y >= playerPosition.y - terrain.chunkHeight * 2;
+                     y -= terrain.chunkHeight)
                 {
                     chunkPos = GetChunkPositionFromCoordinates(terrain, new Vector3Int(x, y, z));
                     chunkDataPositionsToCreate.Add(chunkPos);
@@ -270,7 +274,8 @@ public static class TerrainHelper
         return containerChunk;
     }
 
-    internal static List<Vector3Int> GetUnnecessaryData(TerrainData terrainData, List<Vector3Int> allChunkDataPositionsNeeded)
+    internal static List<Vector3Int> GetUnnecessaryData(TerrainData terrainData,
+        List<Vector3Int> allChunkDataPositionsNeeded)
     {
         return terrainData.chunkDictionary.Keys
             .Where(pos => allChunkDataPositionsNeeded.Contains(pos) == false &&
@@ -278,7 +283,8 @@ public static class TerrainHelper
             .ToList();
     }
 
-    internal static List<Vector3Int> GetUnnecessaryChunks(TerrainData terrainData, List<Vector3Int> allChunkPositionsNeeded)
+    internal static List<Vector3Int> GetUnnecessaryChunks(TerrainData terrainData,
+        List<Vector3Int> allChunkPositionsNeeded)
     {
         List<Vector3Int> positionToRemove = new List<Vector3Int>();
         foreach (var pos in terrainData.chunkRendererDictionary.Keys

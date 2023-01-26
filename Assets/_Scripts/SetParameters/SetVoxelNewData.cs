@@ -16,9 +16,9 @@ public class SetVoxelNewData : MonoBehaviour
 /// It's a function that adds the child objects of a parent object to a list, and then sets the values
 /// of the objects in the list to a default value.
 /// </summary>
-    void Start()
+public void Start()
     {
-        for (int i = 0; i < voxelParameterParent.transform.childCount; i++)
+        for (var i = 0; i < voxelParameterParent.transform.childCount; i++)
         {
             voxelDataList.Add(voxel.voxelDataList[i]);
             voxelParameters.Add(voxelParameterParent.transform.GetChild(i).gameObject);
@@ -35,9 +35,9 @@ public class SetVoxelNewData : MonoBehaviour
 /// <summary>
 /// It's a function that sets the text of an input field to the value of a variable.
 /// </summary>
-    public void SetText()
+private void SetText()
     {
-        for (int i = 0; i < voxelParameterParent.transform.childCount; i++)
+        for (var i = 0; i < voxelParameterParent.transform.childCount; i++)
         {
             if(voxelParameters[i].name == voxelDataList[i].voxelType.ToString())
                 voxelParameters[i].transform.GetChild(0).GetComponent<InputField>().text = voxelDataList[i].durability.ToString();
@@ -50,20 +50,18 @@ public class SetVoxelNewData : MonoBehaviour
 /// the voxel is isPlaceable or not. If it is, it disables the button that says "Place". If it isn't, it
 /// disables the button that says "Destroy".
 /// </summary>
-    public void SetClicked()
+private void SetClicked()
     {
-        for (int i = 1; i < voxelParameterParent.transform.childCount; i++)
+        for (var i = 1; i < voxelParameterParent.transform.childCount; i++)
         {
-            if (voxelParameters[i].name == voxelDataList[i].voxelType.ToString())
+            if (voxelParameters[i].name != voxelDataList[i].voxelType.ToString()) continue;
+            if(voxelDataList[i].isPlaceable == true)
             {
-                if(voxelDataList[i].isPlaceable == true)
-                {
-                    voxelParameters[i].transform.GetChild(2).GetComponent<Button>().interactable = false;
-                }
-                else
-                {
-                    voxelParameters[i].transform.GetChild(3).GetComponent<Button>().interactable = false;
-                }
+                voxelParameters[i].transform.GetChild(2).GetComponent<Button>().interactable = false;
+            }
+            else
+            {
+                voxelParameters[i].transform.GetChild(3).GetComponent<Button>().interactable = false;
             }
         }
     }
@@ -74,14 +72,12 @@ public class SetVoxelNewData : MonoBehaviour
 /// </summary>
     public void SetDurabilityData()
     {
-        for (int i = 0; i < voxelParameterParent.transform.childCount; i++)
+        for (var i = 0; i < voxelParameterParent.transform.childCount; i++)
         {
-            GameObject currentButton = EventSystem.current.currentSelectedGameObject;
-            if (currentButton.transform.parent.gameObject.name == voxelDataList[i].voxelType.ToString())
-            {
-                Text newParameter = voxelParameters[i].transform.GetChild(0).GetChild(2).GetComponent<Text>();
-                voxelDataList[i].durability = int.Parse(newParameter.text);
-            }
+            var currentButton = EventSystem.current.currentSelectedGameObject;
+            if (currentButton.transform.parent.gameObject.name != voxelDataList[i].voxelType.ToString()) continue;
+            var newParameter = voxelParameters[i].transform.GetChild(0).GetChild(2).GetComponent<Text>();
+            voxelDataList[i].durability = int.Parse(newParameter.text);
         }
         SetText();
     }
@@ -94,7 +90,7 @@ public class SetVoxelNewData : MonoBehaviour
     {
         for (int i = 0; i < voxelParameterParent.transform.childCount; i++)
         {
-            GameObject currentButton = EventSystem.current.currentSelectedGameObject;
+            var currentButton = EventSystem.current.currentSelectedGameObject;
             if (currentButton.transform.parent.gameObject.name == voxelParameters[i].name)
             {
                 voxelDataList[i].isPlaceable = currentButton.name == "Set On";
