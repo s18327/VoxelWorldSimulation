@@ -152,7 +152,7 @@ public static class ChunkHelper
 /// <returns>
 /// A Vector3Int
 /// </returns>
-    public static Vector3Int GetVoxelPosInChunkCoordinates(Chunk chunk, Vector3Int position) //TODO: Get Relative position from chunk coordinate?
+    public static Vector3Int GetVoxelPosInChunkCoordinates(Chunk chunk, Vector3Int position) 
     {
         return new Vector3Int
         {

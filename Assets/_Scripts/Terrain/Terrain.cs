@@ -213,7 +213,7 @@ public class Terrain : MonoBehaviour
     }
 
 
-    internal void SetVoxel(RaycastHit hit, VoxelType voxelType) //TODO:Check this and the Place Voxel Below 
+    internal void SetVoxel(RaycastHit hit, VoxelType voxelType) 
     {
         var chunkRenderer = hit.collider.GetComponent<ChunkRenderer>();
 
@@ -260,7 +260,7 @@ public class Terrain : MonoBehaviour
     }
 
     private static Vector3Int
-        PlaceVoxelInPosition(Vector3Int hitPosition, RaycastHit hit) //TODO: check if position is in chunk.
+        PlaceVoxelInPosition(Vector3Int hitPosition, RaycastHit hit) 
     {
         var position = new Vector3(
             hitPosition.x + hit.normal.x,
