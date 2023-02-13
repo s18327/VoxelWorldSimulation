@@ -174,8 +174,7 @@ public static class ChunkHelper
         Mesh mesh = new Mesh(true);
 
         IterateVoxels(chunk, (x, y, z) => mesh = VoxelHelper.GetMeshData(chunk, x, y, z, mesh, chunk.chunkVoxelStorage[GetIndexFromPosition(chunk, x, y, z)]));
-
-
+        
         return mesh;
     }
 

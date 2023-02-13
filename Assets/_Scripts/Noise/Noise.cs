@@ -7,22 +7,16 @@ public static class Noise
 {
     
 /// <summary>
-/// > RemapValue01(value, outputMin, outputMax) = outputMin + (value - 0) * (outputMax - outputMin) / 1
+/// > Remaps the value from the original 0.0 - 1.0 range to the new range from 0 to chunk height.
 /// </summary>
 /// <param name="value">The value to remap.</param>
-/// <param name="outputMin">The minimum value of the output range.</param>
 /// <param name="outputMax">The maximum value of the output range.</param>
 /// <returns>
-/// The value of the outputMin + value  * (outputMax - outputMin)
+/// The new value
 /// </returns>
-    public static float RemapValue(float value, float outputMin, float outputMax)
+    public static int RemapValue(float value, float outputMax)
     {
-        return outputMin + value  * (outputMax - outputMin);
-    }
-
-    public static int RemapValueToInt(float value, float outputMin, float outputMax)
-    {
-        return (int)RemapValue(value, outputMin, outputMax);
+        return (int)(value * outputMax);
     }
 
 /// <summary>
@@ -46,8 +40,8 @@ public static class Noise
         x += settings.noiseZoom;
         z += settings.noiseZoom;
 
-        var noise = Mathf.PerlinNoise((settings.offset.x + settings.terrainOffset.x + x), 
-                                        (settings.offset.y + settings.terrainOffset.y + z));
+        var noise = Mathf.PerlinNoise(settings.offset.x + settings.terrainOffset.x + x, 
+                                        settings.offset.y + settings.terrainOffset.y + z);
         
         return noise;
     }
